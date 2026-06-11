@@ -21,6 +21,16 @@ class PostController extends Controller
             'success' => true,
             'message' => 'List Data Post',
             'data' => PostResource::collection($posts),
+            // 'meta' => [
+            //     'current_page' => $stores->currentPage(),
+            //     'last_page' => $stores->lastPage(),
+            //     'per_page' => $stores->perPage(),
+            //     'total' => $stores->total(),
+            // ],
+            // 'links' => [
+            //     'next' => $stores->nextPageUrl(),
+            //     'prev' => $stores->previousPageUrl(),
+            // ],
         ]);
     }
 

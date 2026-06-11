@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\StoreListResource;
 use App\Http\Resources\StoreResource;
 use App\Models\Store;
 use Illuminate\Http\Request;
@@ -17,23 +16,13 @@ class StoreController extends Controller
      */
     public function index()
     {
-        $stores = Store::latest('id')->limit(10)->get();
+        $stores = Store::with('todayOperatingHour')->get();
 
         return response()->json([
             'success' => true,
             'message' => 'List Data Store',
-            'data' => StoreListResource::collection($stores),
-            // 'meta' => [
-            //     'current_page' => $stores->currentPage(),
-            //     'last_page' => $stores->lastPage(),
-            //     'per_page' => $stores->perPage(),
-            //     'total' => $stores->total(),
-            // ],
-            // 'links' => [
-            //     'next' => $stores->nextPageUrl(),
-            //     'prev' => $stores->previousPageUrl(),
-            // ],
-        ]);
+            'data' => StoreResource::collection($stores),
+        ], 200);
     }
 
     /**
@@ -47,7 +36,9 @@ class StoreController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'address' => 'nullable|string',
             'phone' => 'nullable|string|max:20',
-            'is_open' => 'boolean',
+            'latitude' => 'nullable|string',
+            'longitude' => 'nullable|string',
+            'is_active' => 'boolean',
         ]);
 
         $image = $request->file('image');
@@ -76,7 +67,7 @@ class StoreController extends Controller
             'success' => true,
             'message' => 'Detail Store',
             'data' => new StoreResource($store),
-        ]);
+        ], 200);
     }
 
     /**
@@ -122,6 +113,6 @@ class StoreController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Store deleted successfully',
-        ]);
+        ], 200);
     }
 }

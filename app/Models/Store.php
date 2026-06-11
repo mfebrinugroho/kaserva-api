@@ -16,17 +16,48 @@ class Store extends Model
         'slug',
         'description',
         'image',
+        'banner',
         'address',
         'phone',
+        'latitude',
+        'longitude',
         'is_open',
+        'closed_reason',
+        'accept_order',
+        'is_active',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'banner_url'];
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
+    public function operatingHours()
+    {
+        return $this->hasMany(StoreOperatingHour::class);
+    }
+
+    public function todayOperatingHour()
+    {
+        return $this->hasOne(StoreOperatingHour::class)
+            ->where('day_of_week', now()->dayOfWeek);
+    }
 
     protected function imageUrl(): Attribute
     {
         return Attribute::make(
-            get: fn($image) => $this->image ? asset('storage/' . $this->image) : null,
+            get: fn() => $this->image
+                ? asset('storage/' . $this->image)
+                : asset('storage/stores/default-store.jpg'),
+        );
+    }
+
+    protected function bannerUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn($banner) => $this->banner ? asset('storage/' . $this->banner) : null,
         );
     }
 
@@ -39,8 +70,25 @@ class Store extends Model
             ->saveSlugsTo('slug');
     }
 
-    public function getRouteKeyName(): string
+    public function isOpenNow(): bool
     {
-        return 'slug';
+        if (!$this->is_open) {
+            return false;
+        }
+
+        $todayHour = $this->todayOperatingHour;
+
+        if (!$todayHour) {
+            return false;
+        }
+
+        if (!$todayHour->is_open) {
+            return false;
+        }
+
+        $now = now()->format('H:i:s');
+
+        return $now >= $todayHour->open_time
+            && $now <= $todayHour->close_time;
     }
 }
