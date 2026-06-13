@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\StoreDetailResource;
 use App\Http\Resources\StoreResource;
 use App\Models\Store;
 use Illuminate\Http\Request;
@@ -45,7 +46,7 @@ class StoreController extends Controller
 
         if ($image) {
             $imageName = Str::uuid() . '.' . $image->getClientOriginalExtension();
-            $path = $image->storeAs('stores', $imageName, 'public');
+            $path = $image->storeAs('images/stores', $imageName, 'public');
             $validated['image'] = $path;
         }
 
@@ -63,10 +64,18 @@ class StoreController extends Controller
      */
     public function show(Store $store)
     {
+        $store->load([
+            'todayOperatingHour',
+            'menuCategories' => function ($query) {
+                $query->where('is_active', true)
+                    ->with(['menus']);
+            },
+        ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Detail Store',
-            'data' => new StoreResource($store),
+            'data' => new StoreDetailResource($store),
         ], 200);
     }
 

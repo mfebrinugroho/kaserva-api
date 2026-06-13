@@ -45,19 +45,31 @@ class Store extends Model
             ->where('day_of_week', now()->dayOfWeek);
     }
 
+    public function menuCategories()
+    {
+        return $this->hasMany(MenuCategory::class);
+    }
+
+    public function menus()
+    {
+        return $this->hasMany(Menu::class);
+    }
+
     protected function imageUrl(): Attribute
     {
         return Attribute::make(
             get: fn() => $this->image
                 ? asset('storage/' . $this->image)
-                : asset('storage/stores/default-store.jpg'),
+                : asset('storage/images/stores/default-store.jpg'),
         );
     }
 
     protected function bannerUrl(): Attribute
     {
         return Attribute::make(
-            get: fn($banner) => $this->banner ? asset('storage/' . $this->banner) : null,
+            get: fn() => $this->banner
+                ? asset('storage/' . $this->banner)
+                : asset('storage/images/store-banners/default-banner.jpg'),
         );
     }
 

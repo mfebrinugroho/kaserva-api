@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('image')->nullable();
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_available')->default(true);
+            // $table->boolean('is_featured')->default(false);
             $table->timestamps();
         });
     }
