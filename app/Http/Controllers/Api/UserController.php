@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -14,12 +16,24 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        Gate::authorize('viewAny', User::class);
+
+        $users = User::with('role')->paginate(5);
 
         return response()->json([
             'success' => true,
             'message' => 'List Data User',
             'data' => UserResource::collection($users),
+            'meta' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'per_page' => $users->perPage(),
+                'total' => $users->total(),
+            ],
+            'links' => [
+                'next' => $users->nextPageUrl(),
+                'prev' => $users->previousPageUrl(),
+            ],
         ], 200);
     }
 
@@ -28,23 +42,77 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        Gate::authorize('create', User::class);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:225',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|string|min:8|confirmed',
+            'role_id' => 'required|integer|exists:roles,id'
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role_id' => $validated['role_id'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User created successfully',
+            'data' => new UserResource($user),
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(User $user)
     {
-        //
+        Gate::authorize('view', $user);
+
+        $user->load('role');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail User',
+            'data' => new UserResource($user)
+        ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        Gate::authorize('update', $user);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:225',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8|confirmed',
+            'role_id' => 'required|integer|exists:roles,id',
+        ]);
+
+        $data = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role_id' => $validated['role_id'],
+        ];
+
+        // password optional
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User updated successfully',
+            'data' => new UserResource($user->fresh()),
+        ]);
     }
 
     /**
@@ -52,6 +120,8 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        Gate::authorize('delete', $user);
+
         $user->delete();
 
         return response()->json([

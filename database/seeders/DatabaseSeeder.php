@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,90 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        DB::table('roles')->insert([
+            [
+                'slug' => 'super-admin',
+                'name' => 'Super Admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => 'admin',
+                'name' => 'Admin',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => 'customer',
+                'name' => 'Customer',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => 'cashier',
+                'name' => 'Cashier',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => 'kitchen',
+                'name' => 'Kitchen',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+
+        DB::table('users')->insert([
+            [
+                'name' => 'Jett Knives',
+                'email' => 'jett.superadmin@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 1,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Chamber Sniper',
+                'email' => 'chamber.admin@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Killjoy Bombbot',
+                'email' => 'killjoy.admin@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Neon Speeder',
+                'email' => 'neon.customer@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 3,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Sova Hunter',
+                'email' => 'sova.cashier@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 4,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Yoru Shadow',
+                'email' => 'yoru.kitchen@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 5,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+
         DB::table('stores')->insert([
             [
                 'name' => 'Dapur Nusantara',
@@ -66,6 +151,17 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ],
+        ]);
+
+        DB::table('store_users')->insert([
+            [
+                'store_id' => 1,
+                'user_id' => 2,
+            ],
+            [
+                'store_id' => 2,
+                'user_id' => 3,
             ],
         ]);
 
@@ -482,6 +578,52 @@ class DatabaseSeeder extends Seeder
                 'is_available' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
+            ],
+        ]);
+
+        DB::table('permissions')->insert([
+            [
+                'slug' => "user.view",
+                'name' => "Lihat User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "user.create",
+                'name' => "Tambah User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "user.update",
+                'name' => "Edit User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "user.delete",
+                'name' => "Hapus User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
+
+        DB::table('permission_role')->insert([
+            [
+                'role_id' => 1,
+                'permission_id' => 1,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 2,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 3,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 4,
             ],
         ]);
     }

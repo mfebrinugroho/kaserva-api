@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\AuthResource;
+use App\Http\Resources\UserAuthResource;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -31,7 +31,7 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Registered successfully',
-            'data' => new AuthResource($user),
+            'data' => new UserAuthResource($user),
             'token' => $token
         ]);
     }
@@ -61,6 +61,13 @@ class AuthController extends Controller
             'token' => $token,
             'user' => $user,
         ]);
+    }
+
+    public function me(Request $request)
+    {
+        return new UserAuthResource(
+            $request->user()->load('role.permissions')
+        );
     }
 
     public function logout(Request $request)

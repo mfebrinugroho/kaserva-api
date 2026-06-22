@@ -55,6 +55,11 @@ class Store extends Model
         return $this->hasMany(Menu::class);
     }
 
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'store_users');
+    }
+
     protected function imageUrl(): Attribute
     {
         return Attribute::make(

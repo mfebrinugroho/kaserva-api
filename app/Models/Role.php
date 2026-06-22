@@ -17,7 +17,7 @@ class Role extends Model
     ];
 
     protected $casts = [
-        'role' => UserRole::class,
+        'slug' => UserRole::class,
     ];
 
     public function getSlugOptions(): SlugOptions
@@ -32,5 +32,10 @@ class Role extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'permission_role');
     }
 }

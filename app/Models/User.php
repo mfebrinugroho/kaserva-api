@@ -57,4 +57,26 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function stores()
+    {
+        return $this->belongsToMany(Store::class, 'store_users');
+    }
+
+    // public function hasPermission(string $permission): bool
+    // {
+    //     return $this->role->permissions()->where('slug', $permission)->exists();
+    // }
+
+    // public function hasStoreAccess(int $storeId): bool
+    // {
+    //     return $this->stores()->where('stores.id', $storeId)->exists();
+    // }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->role
+            ? $this->role->permissions->contains('slug', $permission)
+            : false;
+    }
 }
