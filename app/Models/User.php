@@ -79,4 +79,15 @@ class User extends Authenticatable
             ? $this->role->permissions->contains('slug', $permission)
             : false;
     }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function ($q) use ($search) {
+            $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%")
+                ->orWhereHas('role', function ($r) use ($search) {
+                    $r->where('name', 'like', "%{$search}%");
+                });
+        });
+    }
 }

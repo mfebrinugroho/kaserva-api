@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserAuthResource;
+use App\Http\Resources\UserResource;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -57,6 +58,7 @@ class AuthController extends Controller
         $token = $user->createToken('api-token')->plainTextToken;
 
         return response()->json([
+            'success' => true,
             'message' => 'Login berhasil',
             'token' => $token,
             'user' => $user,
@@ -65,9 +67,18 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return new UserAuthResource(
-            $request->user()->load('role.permissions')
-        );
+        // $user = $request->user()
+        //     ->load('role:id,slug,name', 'role.permissions:id,slug,name');
+
+        $user = User::select('id', 'name', 'email', 'role_id')
+            ->with('role:id,slug,name', 'role.permissions:id,slug,name')
+            ->find($request->user()->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data anda sendiri',
+            'data' => new UserAuthResource($user),
+        ]);
     }
 
     public function logout(Request $request)

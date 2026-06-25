@@ -18,11 +18,11 @@ class UserAuthResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
-            'role' => new RoleResource(
+            'role' => new RoleMeResource(
                 $this->whenLoaded('role')
             ),
-            'permissions' => PermissionResource::collection(
-                $this->whenLoaded('role')?->permissions ?? []
+            'permissions' => PermissionMeResource::collection(
+                $this->whenLoaded('role')?->permissions ?? collect()
             ),
         ];
     }

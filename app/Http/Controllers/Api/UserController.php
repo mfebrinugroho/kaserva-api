@@ -14,11 +14,18 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         Gate::authorize('viewAny', User::class);
 
-        $users = User::with('role')->paginate(5);
+        $perPage = $request->get('per_page', 10);
+
+        $search = $request->get('search');
+
+        $users = User::with('role')
+            ->search($search)
+            ->paginate($perPage)
+            ->withQueryString();
 
         return response()->json([
             'success' => true,
