@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 Route::apiResource('posts', PostController::class)->only(['index', 'show']);
-Route::apiResource('roles', RoleController::class);
 Route::apiResource('stores', StoreController::class);
 
 
@@ -28,6 +27,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // Role
+    Route::apiResource('roles', RoleController::class);
+
 
     // Super Admin
     Route::middleware('role:super-admin')->group(function () {

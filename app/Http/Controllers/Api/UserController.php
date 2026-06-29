@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -18,7 +19,7 @@ class UserController extends Controller
     {
         Gate::authorize('viewAny', User::class);
 
-        $perPage = $request->get('per_page', 10);
+        $perPage = $request->get('limit', 10);
 
         $search = $request->get('search');
 
@@ -65,6 +66,8 @@ class UserController extends Controller
             'role_id' => $validated['role_id'],
         ]);
 
+        // $user->load('role');
+
         return response()->json([
             'success' => true,
             'message' => 'User created successfully',
@@ -97,7 +100,11 @@ class UserController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:225',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($user->id),
+            ],
             'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'required|integer|exists:roles,id',
         ]);
