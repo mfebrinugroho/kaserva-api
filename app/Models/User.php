@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -80,7 +82,14 @@ class User extends Authenticatable
             : false;
     }
 
-    public function scopeSearch($query, $search)
+    public function hasRole(UserRole $role): bool
+    {
+        return $this->role
+            ? $this->role->slug === $role
+            : false;
+    }
+
+    public function scopeSearch(object $query, string $search)
     {
         return $query->where(function ($q) use ($search) {
             $q->where('name', 'like', "%{$search}%")

@@ -23,16 +23,16 @@ class Store extends Model
         'longitude',
         'is_open',
         'closed_reason',
-        'accept_order',
+        'is_accept_order',
         'is_active',
     ];
 
     protected $appends = ['image_url', 'banner_url'];
 
-    public function getRouteKeyName(): string
-    {
-        return 'slug';
-    }
+    // public function getRouteKeyName(): string
+    // {
+    //     return 'slug';
+    // }
 
     public function operatingHours()
     {
@@ -65,7 +65,7 @@ class Store extends Model
         return Attribute::make(
             get: fn() => $this->image
                 ? asset('storage/' . $this->image)
-                : asset('storage/images/stores/default-store.jpg'),
+                : asset('storage/images/stores/profile/default.jpg'),
         );
     }
 
@@ -74,7 +74,7 @@ class Store extends Model
         return Attribute::make(
             get: fn() => $this->banner
                 ? asset('storage/' . $this->banner)
-                : asset('storage/images/store-banners/default-banner.jpg'),
+                : asset('storage/images/stores/banner/default.jpg'),
         );
     }
 

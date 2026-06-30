@@ -24,6 +24,9 @@ class UserAuthResource extends JsonResource
             'permissions' => PermissionMeResource::collection(
                 $this->whenLoaded('role')?->permissions ?? collect()
             ),
+            'stores' => StoreMeResource::collection(
+                $this->whenLoaded('stores') ?? collect()
+            ),
         ];
     }
 }

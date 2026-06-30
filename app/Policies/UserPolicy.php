@@ -2,39 +2,43 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
+    public function before(User $user): bool|null
+    {
+        if ($user->hasRole(UserRole::SuperAdmin)) {
+            return true;
+        }
+
+        return null;
+    }
+
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user): Response
+    public function viewAny(User $user): bool
     {
-        return $user->hasPermission('user.view')
-            ? Response::allow()
-            : Response::deny('Anda tidak memiliki izin untuk melihat daftar data user.');
+        return false;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, User $model): Response
+    public function view(User $user, User $model): bool
     {
-        return $user->hasPermission('user.view')
-            ? Response::allow()
-            : Response::deny('Anda tidak memiliki izin untuk melihat data user ini.');
+        return false;
     }
 
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): Response
+    public function create(User $user): bool
     {
-        return $user->hasPermission('user.create')
-            ? Response::allow()
-            : Response::deny('Anda tidak memiliki izin untuk membuat data user.');
+        return false;
     }
 
     /**
@@ -42,7 +46,7 @@ class UserPolicy
      */
     public function update(User $user, User $model): bool
     {
-        return $user->hasPermission('user.update');
+        return false;
     }
 
     /**
@@ -50,6 +54,6 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
-        return $user->hasPermission('user.delete');
+        return false;
     }
 }

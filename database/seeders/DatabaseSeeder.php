@@ -22,6 +22,12 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'slug' => 'owner',
+                'name' => 'Owner',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'slug' => 'admin',
                 'name' => 'Admin',
                 'created_at' => now(),
@@ -57,10 +63,26 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ],
             [
+                'name' => 'Astra Galaxy',
+                'email' => 'astra.owner@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Fade Snake',
+                'email' => 'fade.owner@gmail.com',
+                'password' => Hash::make('123'),
+                'role_id' => 2,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'name' => 'Chamber Sniper',
                 'email' => 'chamber.admin@gmail.com',
                 'password' => Hash::make('123'),
-                'role_id' => 2,
+                'role_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -68,7 +90,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Killjoy Bombbot',
                 'email' => 'killjoy.admin@gmail.com',
                 'password' => Hash::make('123'),
-                'role_id' => 2,
+                'role_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -76,7 +98,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Neon Speeder',
                 'email' => 'neon.customer@gmail.com',
                 'password' => Hash::make('123'),
-                'role_id' => 3,
+                'role_id' => 4,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -84,7 +106,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Sova Hunter',
                 'email' => 'sova.cashier@gmail.com',
                 'password' => Hash::make('123'),
-                'role_id' => 4,
+                'role_id' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
@@ -92,7 +114,7 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Yoru Shadow',
                 'email' => 'yoru.kitchen@gmail.com',
                 'password' => Hash::make('123'),
-                'role_id' => 5,
+                'role_id' => 6,
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
@@ -111,7 +133,7 @@ class DatabaseSeeder extends Seeder
                 'longitude' => 109.34250000,
                 'is_open' => true,
                 'closed_reason' => '',
-                'accept_order' => true,
+                'is_accept_order' => true,
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -129,7 +151,7 @@ class DatabaseSeeder extends Seeder
                 'longitude' => 109.34110000,
                 'is_open' => true,
                 'closed_reason' => '',
-                'accept_order' => true,
+                'is_accept_order' => true,
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -147,7 +169,7 @@ class DatabaseSeeder extends Seeder
                 'longitude' => 109.34490000,
                 'is_open' => false,
                 'closed_reason' => 'Tutup Sementara',
-                'accept_order' => true,
+                'is_accept_order' => true,
                 'is_active' => true,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -606,6 +628,30 @@ class DatabaseSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
+            [
+                'slug' => "store.view",
+                'name' => "Lihat Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.create",
+                'name' => "Tambah Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.update",
+                'name' => "Edit Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.delete",
+                'name' => "Hapus Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
         ]);
 
         DB::table('permission_role')->insert([
@@ -624,6 +670,38 @@ class DatabaseSeeder extends Seeder
             [
                 'role_id' => 1,
                 'permission_id' => 4,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 5,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 6,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 7,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 8,
+            ],
+            [
+                'role_id' => 2,
+                'permission_id' => 5,
+            ],
+            [
+                'role_id' => 2,
+                'permission_id' => 6,
+            ],
+            [
+                'role_id' => 2,
+                'permission_id' => 7,
+            ],
+            [
+                'role_id' => 2,
+                'permission_id' => 8,
             ],
         ]);
     }

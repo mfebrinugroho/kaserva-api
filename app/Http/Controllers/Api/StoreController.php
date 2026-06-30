@@ -2,27 +2,50 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\StoreDetailResource;
 use App\Http\Resources\StoreResource;
 use App\Models\Store;
+use App\Services\FileUploadService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Gate;
 
 class StoreController extends Controller
 {
+    public function __construct(
+        private FileUploadService $fileUploadService
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $stores = Store::with('todayOperatingHour')->get();
+        Gate::authorize('viewAny', Store::class);
+
+        $user = $request->user();
+
+        if ($user->hasRole(UserRole::SuperAdmin)) {
+            $stores = Store::query()->paginate(10);
+        } else {
+            $stores = $user->stores()->paginate(10);
+        }
+
 
         return response()->json([
             'success' => true,
             'message' => 'List Data Store',
             'data' => StoreResource::collection($stores),
+            'meta' => [
+                'current_page' => $stores->currentPage(),
+                'last_page' => $stores->lastPage(),
+                'per_page' => $stores->perPage(),
+                'total' => $stores->total(),
+            ],
+            'links' => [
+                'next' => $stores->nextPageUrl(),
+                'prev' => $stores->previousPageUrl(),
+            ],
         ], 200);
     }
 
@@ -31,23 +54,31 @@ class StoreController extends Controller
      */
     public function store(Request $request)
     {
+        Gate::authorize('create', Store::class);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
+            'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'address' => 'required|string',
+            'phone' => 'required|string|max:15',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
-            'is_active' => 'boolean',
         ]);
 
-        $image = $request->file('image');
+        if ($request->hasFile('image')) {
+            $validated['image'] = $this->fileUploadService->upload(
+                $request->file('image'),
+                'images/stores/profile'
+            );
+        }
 
-        if ($image) {
-            $imageName = Str::uuid() . '.' . $image->getClientOriginalExtension();
-            $path = $image->storeAs('images/stores', $imageName, 'public');
-            $validated['image'] = $path;
+        if ($request->hasFile('banner')) {
+            $validated['banner'] = $this->fileUploadService->upload(
+                $request->file('banner'),
+                'images/stores/banner'
+            );
         }
 
         $store = Store::create($validated);
@@ -64,18 +95,20 @@ class StoreController extends Controller
      */
     public function show(Store $store)
     {
-        $store->load([
-            'todayOperatingHour',
-            'menuCategories' => function ($query) {
-                $query->where('is_active', true)
-                    ->with(['menus']);
-            },
-        ]);
+        Gate::authorize('view', $store);
+
+        // $store->load([
+        //     'todayOperatingHour',
+        //     'menuCategories' => function ($query) {
+        //         $query->where('is_active', true)
+        //             ->with(['menus']);
+        //     },
+        // ]);
 
         return response()->json([
             'success' => true,
             'message' => 'Detail Store',
-            'data' => new StoreDetailResource($store),
+            'data' => new StoreResource($store),
         ], 200);
     }
 
@@ -84,28 +117,42 @@ class StoreController extends Controller
      */
     public function update(Request $request, Store $store)
     {
+        Gate::authorize('update', $store);
+
         $validated = $request->validate([
-            'name' => 'string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'address' => 'nullable|string',
-            'phone' => 'nullable|string|max:20',
-            'is_open' => 'boolean',
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
+            'address' => 'required|string',
+            'phone' => 'required|string|max:15',
+            'latitude' => 'nullable|string',
+            'longitude' => 'nullable|string',
         ]);
 
-        // $image = $request->file('image');
+        if ($request->hasFile('image')) {
+            $validated['image'] = $this->fileUploadService->replace(
+                $store->image,
+                $request->file('image'),
+                'images/stores/profile'
+            );
+        }
 
-        // if ($image) {
-        //     # code...
-        // }
+        if ($request->hasFile('banner')) {
+            $validated['banner'] = $this->fileUploadService->replace(
+                $store->banner,
+                $request->file('banner'),
+                'images/stores/banner'
+            );
+        }
 
-        // $store->update($validated);
+        $store->update($validated);
 
-        // return response()->json([
-        //     'success' => true,
-        //     'message' => 'Store updated successfully',
-        //     'data' => new StoreResource($store),
-        // ]);
+        return response()->json([
+            'success' => true,
+            'message' => 'Store updated successfully',
+            'data' => new StoreResource($store->fresh()),
+        ]);
     }
 
     /**
@@ -113,8 +160,14 @@ class StoreController extends Controller
      */
     public function destroy(Store $store)
     {
+        Gate::authorize('delete', $store);
+
         if ($store->image) {
-            Storage::disk('public')->delete($store->image);
+            $this->fileUploadService->delete($store->image);
+        }
+
+        if ($store->banner) {
+            $this->fileUploadService->delete($store->banner);
         }
 
         $store->delete();

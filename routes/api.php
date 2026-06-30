@@ -12,35 +12,31 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
-Route::apiResource('posts', PostController::class)->only(['index', 'show']);
-Route::apiResource('stores', StoreController::class);
+// Route::apiResource('posts', PostController::class)->only(['index', 'show']);
 
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('posts', PostController::class)->except(['index', 'show']);
+    // Route::apiResource('posts', PostController::class)->except(['index', 'show']);
 
-    // Get User
+    // Get User Login
     Route::get('/user', [AuthController::class, 'me']);
-
     // Logout
     Route::post('/logout', [AuthController::class, 'logout']);
-
     // Role
     Route::apiResource('roles', RoleController::class);
 
 
     // Super Admin
     Route::middleware('role:super-admin')->group(function () {
-        Route::get('/super-admin-test', function () {
-            return response()->json([
-                'message' => 'Super Admin Access'
-            ]);
-        });
-
         Route::apiResource('users', UserController::class);
+    });
+
+    // Owner
+    Route::middleware('role:owner,super-admin')->group(function () {
+        Route::apiResource('stores', StoreController::class);
     });
 
     // Admin

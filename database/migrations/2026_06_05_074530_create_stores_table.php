@@ -27,7 +27,7 @@ return new class extends Migration
             $table->text('closed_reason')->nullable();
 
             // menerima order
-            $table->boolean('accept_order')->default(true);
+            $table->boolean('is_accept_order')->default(true);
 
             // sementara tutup
             $table->boolean('is_active')->default(true);

@@ -71,7 +71,7 @@ class AuthController extends Controller
         //     ->load('role:id,slug,name', 'role.permissions:id,slug,name');
 
         $user = User::select('id', 'name', 'email', 'role_id')
-            ->with('role:id,slug,name', 'role.permissions:id,slug,name')
+            ->with('stores:id,slug,name', 'role:id,slug,name', 'role.permissions:id,slug,name')
             ->find($request->user()->id);
 
         return response()->json([
