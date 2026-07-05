@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\UserRole;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -36,6 +37,10 @@ class StoreResource extends JsonResource
             // 'today_operating_hour' => new StoreOperatingHourResource(
             //     $this->whenLoaded('todayOperatingHour')
             // ),
+            'owner' => $this->when(
+                $request->user()->hasRole(UserRole::SuperAdmin),
+                fn() => new UserResource($this->owners->first())
+            ),
         ];
     }
 }

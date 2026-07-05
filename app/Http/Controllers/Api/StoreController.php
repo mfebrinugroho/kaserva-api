@@ -25,12 +25,17 @@ class StoreController extends Controller
 
         $user = $request->user();
 
-        if ($user->hasRole(UserRole::SuperAdmin)) {
-            $stores = Store::query()->paginate(10);
-        } else {
-            $stores = $user->stores()->paginate(10);
-        }
+        $perPage = $request->get('limit', 10);
 
+        $search = $request->get('search');
+
+        if ($user->hasRole(UserRole::SuperAdmin)) {
+            $stores = Store::with('owners')->search($search)
+                ->paginate($perPage)
+                ->withQueryString();
+        } else {
+            $stores = $user->stores()->search($search)->paginate($perPage)->withQueryString();
+        }
 
         return response()->json([
             'success' => true,
@@ -57,12 +62,12 @@ class StoreController extends Controller
         Gate::authorize('create', Store::class);
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'required|string',
+            'name' => 'required|string|max:100',
+            'description' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             'address' => 'required|string',
-            'phone' => 'required|string|max:15',
+            'phone' => 'required|string|max:20',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
         ]);

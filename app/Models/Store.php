@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\UserRole;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Sluggable\HasSlug;
@@ -60,6 +62,14 @@ class Store extends Model
         return $this->belongsToMany(User::class, 'store_users');
     }
 
+    public function owners()
+    {
+        return $this->belongsToMany(User::class, 'store_users')
+            ->whereHas('role', function ($query) {
+                $query->where('slug', UserRole::Owner->value);
+            });
+    }
+
     protected function imageUrl(): Attribute
     {
         return Attribute::make(
@@ -107,5 +117,15 @@ class Store extends Model
 
         return $now >= $todayHour->open_time
             && $now <= $todayHour->close_time;
+    }
+
+    public function scopeSearch(Builder $query, ?string $search): Builder
+    {
+        return $query->when($search, function (Builder $query, string $search) {
+            $query->where(function (Builder $q) use ($search) {
+                $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('address', 'ILIKE', "%{$search}%");
+            });
+        });
     }
 }
