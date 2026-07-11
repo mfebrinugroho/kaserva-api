@@ -704,5 +704,10 @@ class DatabaseSeeder extends Seeder
                 'permission_id' => 8,
             ],
         ]);
+
+        $this->call([
+            UserSeeder::class,
+            StoreSeeder::class,
+        ]);
     }
 }

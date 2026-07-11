@@ -30,11 +30,12 @@ class StoreController extends Controller
         $search = $request->get('search');
 
         if ($user->hasRole(UserRole::SuperAdmin)) {
-            $stores = Store::with('owners')->search($search)
+            $stores = Store::with('owner')->search($search)
+                ->orderBy('id', 'asc')
                 ->paginate($perPage)
                 ->withQueryString();
         } else {
-            $stores = $user->stores()->search($search)->paginate($perPage)->withQueryString();
+            $stores = $user->stores()->search($search)->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
         }
 
         return response()->json([
@@ -63,34 +64,31 @@ class StoreController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'description' => 'required|string|max:255',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
-            'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
-            'address' => 'required|string',
-            'phone' => 'required|string|max:20',
-            'latitude' => 'nullable|string',
-            'longitude' => 'nullable|string',
+            'description' => 'nullable|string|max:255',
+            'address' => 'nullable|string',
+            'phone' => 'nullable|string|max:20',
+            'is_active' => 'required|boolean',
         ]);
 
-        if ($request->hasFile('image')) {
-            $validated['image'] = $this->fileUploadService->upload(
-                $request->file('image'),
-                'images/stores/profile'
-            );
-        }
+        // if ($request->hasFile('image')) {
+        //     $validated['image'] = $this->fileUploadService->upload(
+        //         $request->file('image'),
+        //         'images/stores/profile'
+        //     );
+        // }
 
-        if ($request->hasFile('banner')) {
-            $validated['banner'] = $this->fileUploadService->upload(
-                $request->file('banner'),
-                'images/stores/banner'
-            );
-        }
+        // if ($request->hasFile('banner')) {
+        //     $validated['banner'] = $this->fileUploadService->upload(
+        //         $request->file('banner'),
+        //         'images/stores/banner'
+        //     );
+        // }
 
         $store = Store::create($validated);
 
         return response()->json([
             'success' => true,
-            'message' => 'Store created successfully',
+            'message' => 'Resto/Toko berhasil dibuat.',
             'data' => new StoreResource($store),
         ], 201);
     }
@@ -155,7 +153,7 @@ class StoreController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Store updated successfully',
+            'message' => 'Resto/Toko berhasil diperbarui.',
             'data' => new StoreResource($store->fresh()),
         ]);
     }
@@ -179,7 +177,24 @@ class StoreController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Store deleted successfully',
+            'message' => 'Resto/Toko berhasil dihapus.',
         ], 200);
+    }
+
+    public function updateStatus(Request $request, Store $store)
+    {
+        Gate::authorize('updateStatus', $store);
+
+        $validated = $request->validate([
+            'is_active' => ['required', 'boolean'],
+        ]);
+
+        $store->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status toko berhasil diperbarui',
+            'data' => new StoreResource($store->fresh()),
+        ]);
     }
 }

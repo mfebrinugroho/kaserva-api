@@ -71,4 +71,14 @@ class StorePolicy
     {
         return false;
     }
+
+    public function updateStatus(User $user, Store $store): bool
+    {
+        return false;
+    }
+
+    public function addOwner(User $user, Store $store): bool
+    {
+        return false;
+    }
 }

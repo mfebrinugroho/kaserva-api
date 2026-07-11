@@ -1,11 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\StoreOwnerController;
 use App\Http\Controllers\AuthController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -37,6 +36,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // Owner
     Route::middleware('role:owner,super-admin')->group(function () {
         Route::apiResource('stores', StoreController::class);
+        Route::patch('/stores/{store}/status', [StoreController::class, 'updateStatus']);
+        Route::post('/stores/store-owner', [StoreOwnerController::class, 'addOwner']);
+
+        Route::get('/stores-owners/available-users', [StoreOwnerController::class, 'availableUsers']);
+        Route::get('/stores-owners/available-stores', [StoreOwnerController::class, 'availableStores']);
     });
 
     // Admin

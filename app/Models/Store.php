@@ -5,13 +5,14 @@ namespace App\Models;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class Store extends Model
 {
-    use HasSlug;
+    use HasSlug, HasFactory;
 
     protected $fillable = [
         'name',
@@ -62,12 +63,13 @@ class Store extends Model
         return $this->belongsToMany(User::class, 'store_users');
     }
 
-    public function owners()
+    public function owner()
     {
         return $this->belongsToMany(User::class, 'store_users')
             ->whereHas('role', function ($query) {
                 $query->where('slug', UserRole::Owner->value);
-            });
+            })
+            ->limit(1);
     }
 
     protected function imageUrl(): Attribute

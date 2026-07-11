@@ -39,7 +39,7 @@ class StoreResource extends JsonResource
             // ),
             'owner' => $this->when(
                 $request->user()->hasRole(UserRole::SuperAdmin),
-                fn() => new UserResource($this->owners->first())
+                fn() => new UserResource($this->owner->first())
             ),
         ];
     }
