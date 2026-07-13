@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserAuthResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -142,5 +143,36 @@ class UserController extends Controller
             'success' => true,
             'message' => 'User deleted successfully',
         ], 200);
+    }
+
+    public function activeStore(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'store_id' => ['required', 'exists:stores,id'],
+        ]);
+
+        if (! $user->stores()->where('id', $validated['store_id'])->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak memiliki akses ke toko ini.',
+            ], 403);
+        }
+
+        $user->update([
+            'store_id' => $validated['store_id'],
+        ]);
+
+        // Refresh agar relasi store ikut ter-update
+        $user = User::select('id', 'name', 'email', 'store_id', 'role_id')
+            ->with('stores:id,slug,name', 'role:id,slug,name', 'role.permissions:id,slug,name')
+            ->find($request->user()->id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Resto/Toko berhasil diperbarui',
+            'data' => new UserAuthResource($user),
+        ]);
     }
 }

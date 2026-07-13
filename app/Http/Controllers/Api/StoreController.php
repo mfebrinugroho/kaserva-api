@@ -127,8 +127,8 @@ class StoreController extends Controller
             'description' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
             'banner' => 'nullable|image|mimes:jpeg,png,jpg|max:1024',
-            'address' => 'required|string',
-            'phone' => 'required|string|max:15',
+            'address' => 'nullable|string',
+            'phone' => 'nullable|string|max:15',
             'latitude' => 'nullable|string',
             'longitude' => 'nullable|string',
         ]);
@@ -194,6 +194,40 @@ class StoreController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Status toko berhasil diperbarui',
+            'data' => new StoreResource($store->fresh()),
+        ]);
+    }
+
+    public function updateStatusOperational(Request $request, Store $store)
+    {
+        Gate::authorize('updateStatusOperational', $store);
+
+        $validated = $request->validate([
+            'is_open' => ['required', 'boolean'],
+        ]);
+
+        $store->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status operasional toko berhasil diperbarui',
+            'data' => new StoreResource($store->fresh()),
+        ]);
+    }
+
+    public function updateStatusOrder(Request $request, Store $store)
+    {
+        Gate::authorize('updateStatusOrder', $store);
+
+        $validated = $request->validate([
+            'is_accept_order' => ['required', 'boolean'],
+        ]);
+
+        $store->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status order toko berhasil diperbarui',
             'data' => new StoreResource($store->fresh()),
         ]);
     }

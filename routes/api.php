@@ -37,45 +37,50 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:owner,super-admin')->group(function () {
         Route::apiResource('stores', StoreController::class);
         Route::patch('/stores/{store}/status', [StoreController::class, 'updateStatus']);
+        Route::patch('/stores/{store}/status-operational', [StoreController::class, 'updateStatusOperational']);
+        Route::patch('/stores/{store}/status-order', [StoreController::class, 'updateStatusOrder']);
+
         Route::post('/stores/store-owner', [StoreOwnerController::class, 'addOwner']);
 
         Route::get('/stores-owners/available-users', [StoreOwnerController::class, 'availableUsers']);
         Route::get('/stores-owners/available-stores', [StoreOwnerController::class, 'availableStores']);
+
+        Route::post('/user/active-store', [UserController::class, 'activeStore']);
     });
 
     // Admin
-    Route::middleware('role:admin')->group(function () {
-        Route::get('/admin-test', function () {
-            return response()->json([
-                'message' => 'Admin Access'
-            ]);
-        });
-    });
+    // Route::middleware('role:admin')->group(function () {
+    //     Route::get('/admin-test', function () {
+    //         return response()->json([
+    //             'message' => 'Admin Access'
+    //         ]);
+    //     });
+    // });
 
     // Customer
-    Route::middleware('role:customer')->group(function () {
-        Route::get('/customer-test', function () {
-            return response()->json([
-                'message' => 'Customer Access'
-            ]);
-        });
-    });
+    // Route::middleware('role:customer')->group(function () {
+    //     Route::get('/customer-test', function () {
+    //         return response()->json([
+    //             'message' => 'Customer Access'
+    //         ]);
+    //     });
+    // });
 
     // Cashier
-    Route::middleware('role:cashier')->group(function () {
-        Route::get('/cashier-test', function () {
-            return response()->json([
-                'message' => 'Cashier Access'
-            ]);
-        });
-    });
+    // Route::middleware('role:cashier')->group(function () {
+    //     Route::get('/cashier-test', function () {
+    //         return response()->json([
+    //             'message' => 'Cashier Access'
+    //         ]);
+    //     });
+    // });
 
     // Kitchen
-    Route::middleware('role:kitchen')->group(function () {
-        Route::get('/kitchen-test', function () {
-            return response()->json([
-                'message' => 'Kitchen Access'
-            ]);
-        });
-    });
+    // Route::middleware('role:kitchen')->group(function () {
+    //     Route::get('/kitchen-test', function () {
+    //         return response()->json([
+    //             'message' => 'Kitchen Access'
+    //         ]);
+    //     });
+    // });
 });

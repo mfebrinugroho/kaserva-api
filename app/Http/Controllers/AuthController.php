@@ -70,7 +70,7 @@ class AuthController extends Controller
         // $user = $request->user()
         //     ->load('role:id,slug,name', 'role.permissions:id,slug,name');
 
-        $user = User::select('id', 'name', 'email', 'role_id')
+        $user = User::select('id', 'name', 'email', 'store_id', 'role_id')
             ->with('stores:id,slug,name', 'role:id,slug,name', 'role.permissions:id,slug,name')
             ->find($request->user()->id);
 

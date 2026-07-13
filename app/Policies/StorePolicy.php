@@ -81,4 +81,18 @@ class StorePolicy
     {
         return false;
     }
+
+    public function updateStatusOperational(User $user, Store $store): response
+    {
+        return $user->stores()->whereKey($store->id)->exists()
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+    }
+
+    public function updateStatusOrder(User $user, Store $store): response
+    {
+        return $user->stores()->whereKey($store->id)->exists()
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+    }
 }

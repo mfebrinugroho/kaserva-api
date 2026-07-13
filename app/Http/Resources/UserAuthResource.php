@@ -18,6 +18,7 @@ class UserAuthResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'email' => $this->email,
+            'store_id' => $this->store_id,
             'role' => new RoleMeResource(
                 $this->whenLoaded('role')
             ),

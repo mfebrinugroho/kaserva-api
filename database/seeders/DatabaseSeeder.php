@@ -691,18 +691,18 @@ class DatabaseSeeder extends Seeder
                 'role_id' => 2,
                 'permission_id' => 5,
             ],
-            [
-                'role_id' => 2,
-                'permission_id' => 6,
-            ],
+            // [
+            //     'role_id' => 2,
+            //     'permission_id' => 6,
+            // ],
             [
                 'role_id' => 2,
                 'permission_id' => 7,
             ],
-            [
-                'role_id' => 2,
-                'permission_id' => 8,
-            ],
+            // [
+            //     'role_id' => 2,
+            //     'permission_id' => 8,
+            // ],
         ]);
 
         $this->call([

@@ -22,6 +22,7 @@ class UserResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
             'role_id' => $this->role_id,
+            'store_id' => $this->store_id,
             'role' => new RoleMeResource(
                 $this->whenLoaded('role')
             ),
