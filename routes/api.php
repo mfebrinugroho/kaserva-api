@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\MenuCategoryController;
+use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StoreController;
@@ -27,7 +29,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Role
     Route::apiResource('roles', RoleController::class);
 
-
     // Super Admin
     Route::middleware('role:super-admin')->group(function () {
         Route::apiResource('users', UserController::class);
@@ -39,13 +40,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::patch('/stores/{store}/status', [StoreController::class, 'updateStatus']);
         Route::patch('/stores/{store}/status-operational', [StoreController::class, 'updateStatusOperational']);
         Route::patch('/stores/{store}/status-order', [StoreController::class, 'updateStatusOrder']);
-
         Route::post('/stores/store-owner', [StoreOwnerController::class, 'addOwner']);
-
         Route::get('/stores-owners/available-users', [StoreOwnerController::class, 'availableUsers']);
         Route::get('/stores-owners/available-stores', [StoreOwnerController::class, 'availableStores']);
 
         Route::post('/user/active-store', [UserController::class, 'activeStore']);
+
+        Route::apiResource('menus', MenuController::class);
+        Route::apiResource('menu-categories', MenuCategoryController::class);
     });
 
     // Admin

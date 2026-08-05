@@ -40,7 +40,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users',
+            'email' => 'required|email',
             'password' => 'required'
         ]);
 
@@ -60,8 +60,10 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Login berhasil',
-            'token' => $token,
-            'user' => $user,
+            'data' => [
+                'token' => $token,
+                'user' => $user,
+            ],
         ]);
     }
 

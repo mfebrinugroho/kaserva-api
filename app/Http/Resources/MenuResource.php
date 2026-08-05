@@ -24,6 +24,11 @@ class MenuResource extends JsonResource
             'image_url'  => $this->image_url,
             'sort_order' => $this->sort_order,
             'is_available' => $this->is_available,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+            'category' => new MenuCategoryResource(
+                $this->whenLoaded('category')
+            ),
         ];
     }
 }

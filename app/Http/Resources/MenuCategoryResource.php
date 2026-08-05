@@ -20,9 +20,14 @@ class MenuCategoryResource extends JsonResource
             'name' => $this->name,
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'menus' => MenuResource::collection(
                 $this->whenLoaded('menus')
             ),
+            'store' => new StoreResource(
+                $this->whenLoaded('store')
+            )
         ];
     }
 }

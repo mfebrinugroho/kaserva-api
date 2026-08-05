@@ -4,12 +4,9 @@ namespace App\Models;
 
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
 
 class Role extends Model
 {
-    use HasSlug;
 
     protected $fillable = [
         'name',
@@ -19,15 +16,6 @@ class Role extends Model
     protected $casts = [
         'slug' => UserRole::class,
     ];
-
-    public function getSlugOptions(): SlugOptions
-    {
-        return SlugOptions::create()
-
-            ->generateSlugsFrom('name')
-
-            ->saveSlugsTo('slug');
-    }
 
     public function users()
     {
