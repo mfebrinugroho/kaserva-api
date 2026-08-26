@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\StoreOptionResource;
 use App\Http\Resources\StoreResource;
 use App\Models\Store;
 use App\Services\FileUploadService;
@@ -31,6 +32,7 @@ class StoreController extends Controller
 
         if ($user->hasRole(UserRole::SuperAdmin)) {
             $stores = Store::with('owner')->search($search)
+                ->latest()
                 ->orderBy('id', 'asc')
                 ->paginate($perPage)
                 ->withQueryString();
@@ -230,5 +232,16 @@ class StoreController extends Controller
             'message' => 'Status order toko berhasil diperbarui',
             'data' => new StoreResource($store->fresh()),
         ]);
+    }
+
+    public function options()
+    {
+        $stores = Store::select('id', 'name')->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'List Data Resto',
+            'data' => StoreOptionResource::collection($stores),
+        ], 200);
     }
 }

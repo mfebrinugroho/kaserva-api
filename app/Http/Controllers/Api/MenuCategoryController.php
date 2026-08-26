@@ -55,7 +55,20 @@ class MenuCategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'store_id' => 'required|numeric',
+            'name' => 'required|string|max:255',
+            'sort_order' => 'required|numeric',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $category = MenuCategory::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori Menu berhasil dibuat.',
+            'data' => new MenuCategoryResource($category),
+        ], 201);
     }
 
     /**

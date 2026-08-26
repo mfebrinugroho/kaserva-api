@@ -603,56 +603,56 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
-        // DB::table('permissions')->insert([
-        //     [
-        //         'slug' => "user.view",
-        //         'name' => "Lihat User",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "user.create",
-        //         'name' => "Tambah User",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "user.update",
-        //         'name' => "Edit User",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "user.delete",
-        //         'name' => "Hapus User",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "store.view",
-        //         'name' => "Lihat Resto",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "store.create",
-        //         'name' => "Tambah Resto",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "store.update",
-        //         'name' => "Edit Resto",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        //     [
-        //         'slug' => "store.delete",
-        //         'name' => "Hapus Resto",
-        //         'created_at' => now(),
-        //         'updated_at' => now(),
-        //     ],
-        // ]);
+        DB::table('permissions')->insert([
+            [
+                'slug' => "user.view",
+                'name' => "Lihat User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "user.create",
+                'name' => "Tambah User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "user.update",
+                'name' => "Edit User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "user.delete",
+                'name' => "Hapus User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.view",
+                'name' => "Lihat Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.create",
+                'name' => "Tambah Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.update",
+                'name' => "Edit Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'slug' => "store.delete",
+                'name' => "Hapus Resto",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+        ]);
 
         DB::table('permission_role')->insert([
             [

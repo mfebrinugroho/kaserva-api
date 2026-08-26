@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class MenuCategory extends Model
 {
+    protected $fillable = [
+        'store_id',
+        'name',
+        'sort_order',
+        'is_active',
+    ];
+
     public function store()
     {
         return $this->belongsTo(Store::class);

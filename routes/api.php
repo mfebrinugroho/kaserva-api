@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Owner
     Route::middleware('role:owner,super-admin')->group(function () {
+        Route::get('/stores/options', [StoreController::class, 'options']);
         Route::apiResource('stores', StoreController::class);
         Route::patch('/stores/{store}/status', [StoreController::class, 'updateStatus']);
         Route::patch('/stores/{store}/status-operational', [StoreController::class, 'updateStatusOperational']);
@@ -43,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/stores/store-owner', [StoreOwnerController::class, 'addOwner']);
         Route::get('/stores-owners/available-users', [StoreOwnerController::class, 'availableUsers']);
         Route::get('/stores-owners/available-stores', [StoreOwnerController::class, 'availableStores']);
+
 
         Route::post('/user/active-store', [UserController::class, 'activeStore']);
 
