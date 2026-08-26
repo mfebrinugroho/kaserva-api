@@ -1,13 +1,6 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
-
-beforeEach(function () {
-  $this->seed();
-});
 
 it('can login', function () {
 
@@ -26,9 +19,9 @@ it('can login', function () {
     ->assertJsonStructure([
       'success',
       'message',
+      'token',
       'data' => [
         'user',
-        'token',
       ]
     ]);
 });

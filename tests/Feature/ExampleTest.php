@@ -1,7 +1,12 @@
 <?php
 
-it('returns a successful response', function () {
-    $response = $this->get('/');
+test('hello api returns correct response', function () {
 
-    $response->assertStatus(200);
+  $response = $this->getJson('/api/example');
+
+  $response
+    ->assertStatus(200)
+    ->assertJson([
+      'message' => 'Example Test',
+    ]);
 });

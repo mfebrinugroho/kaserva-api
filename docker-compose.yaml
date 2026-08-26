@@ -14,5 +14,21 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+  postgres_test:
+    image: postgres:18
+    container_name: kaserva-postgres-test
+
+    ports:
+      - "5433:5432"
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_TEST_DB}
+      POSTGRES_USER: ${POSTGRES_TEST_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_TEST_PASSWORD}
+  
+    volumes:
+      - postgres_test_data:/var/lib/postgresql
+
 volumes:
   postgres_data:
+  postgres_test_data:

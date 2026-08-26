@@ -27,10 +27,11 @@ class UserFactory extends Factory
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            // 'email_verified_at' => now(),
+            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'role_id' => Role::where('slug', 'super-admin')->value('id'),
-            // 'remember_token' => Str::random(10),
+            'role_id' => Role::factory(),
+            'store_id' => null,
+            'remember_token' => Str::random(10),
         ];
     }
 
