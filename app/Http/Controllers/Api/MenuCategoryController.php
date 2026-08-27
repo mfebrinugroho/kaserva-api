@@ -62,12 +62,12 @@ class MenuCategoryController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-        $category = MenuCategory::create($validated);
+        $menu_category = MenuCategory::create($validated);
 
         return response()->json([
             'success' => true,
             'message' => 'Kategori Menu berhasil dibuat.',
-            'data' => new MenuCategoryResource($category),
+            'data' => new MenuCategoryResource($menu_category),
         ], 201);
     }
 
@@ -82,16 +82,36 @@ class MenuCategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, MenuCategory $menu_category)
     {
-        //
+        $validated = $request->validate([
+            'store_id' => 'required|numeric|exists:stores,id',
+            'name' => 'required|string|max:255',
+            'sort_order' => 'required|numeric',
+            'is_active' => 'required|boolean',
+        ]);
+
+        $menu_category->update($validated);
+
+        $menu_category->load('store');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori menu berhasil diperbarui.',
+            'data' => new MenuCategoryResource($menu_category->fresh()),
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(MenuCategory $menu_category)
     {
-        //
+        $menu_category->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kategori menu berhasil dihapus',
+        ], 200);
     }
 }

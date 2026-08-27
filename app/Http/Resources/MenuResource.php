@@ -29,6 +29,9 @@ class MenuResource extends JsonResource
             'category' => new MenuCategoryResource(
                 $this->whenLoaded('category')
             ),
+            'store' => new StoreResource(
+                $this->whenLoaded('store')
+            )
         ];
     }
 }

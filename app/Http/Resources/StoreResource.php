@@ -28,15 +28,24 @@ class StoreResource extends JsonResource
             'latitude' => $this->latitude,
             'longitude' => $this->longitude,
             'is_open' => $this->is_open,
-            // 'is_open_now' => $this->isOpenNow(),
             'closed_reason' => $this->closed_reason,
             'is_accept_order' => $this->is_accept_order,
             'is_active' => $this->is_active,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+            // 'is_open_now' => $this->isOpenNow(),
             // 'today_operating_hour' => new StoreOperatingHourResource(
             //     $this->whenLoaded('todayOperatingHour')
             // ),
+            'menu_categories' => MenuCategoryResource::collection(
+                $this->whenLoaded('menuCaregories')
+            ),
+            'menus' => MenuResource::collection(
+                $this->whenLoaded('menus')
+            ),
+            'users' => MenuResource::collection(
+                $this->whenLoaded('users')
+            ),
             'owner' => $this->when(
                 $request->user()->hasRole(UserRole::SuperAdmin),
                 fn() => new UserResource($this->owner->first())

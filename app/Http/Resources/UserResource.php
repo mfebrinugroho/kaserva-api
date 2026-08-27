@@ -19,13 +19,16 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
             'role_id' => $this->role_id,
             'store_id' => $this->store_id,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
             'role' => new RoleMeResource(
                 $this->whenLoaded('role')
             ),
+            'stores' => StoreResource::collection(
+                $this->whenLoaded('stores')
+            )
         ];
     }
 }

@@ -1,4 +1,23 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: kaserva-api
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/var/www/html
+      - vendor:/var/www/vendor
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    restart: unless-stopped
   postgres:
     image: postgres:18
     container_name: kaserva-postgres
@@ -14,6 +33,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   postgres_test:
     image: postgres:18
     container_name: kaserva-postgres-test
@@ -28,7 +53,14 @@ services:
   
     volumes:
       - postgres_test_data:/var/lib/postgresql
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_TEST_USER} -d ${POSTGRES_TEST_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
   postgres_test_data:
+  vendor:
