@@ -1,24 +1,24 @@
 services:
-  app:
-    image: mfebrinugroho/kaserva-api
-    build:
-      context: .
-      dockerfile: Dockerfile
+  # app:
+  #   image: mfebrinugroho/kaserva-api
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
 
-    container_name: kaserva-api
+  #   container_name: kaserva-api
 
-    ports:
-      - "8000:8000"
+  #   ports:
+  #     - "8000:8000"
 
-    volumes:
-      - .:/var/www/html
-      - vendor:/var/www/html/vendor
+  #   volumes:
+  #     - .:/var/www/html
+  #     - vendor:/var/www/html/vendor
 
-    depends_on:
-      postgres:
-        condition: service_healthy
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
 
-    restart: unless-stopped
+  #   restart: unless-stopped
   postgres:
     image: postgres:18
     container_name: kaserva-postgres
@@ -64,4 +64,4 @@ services:
 volumes:
   postgres_data:
   postgres_test_data:
-  vendor:
+  # vendor:

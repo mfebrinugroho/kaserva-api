@@ -80,9 +80,15 @@ class MenuController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Menu $menu)
     {
-        //
+        $menu->load('store', 'category');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail Menu',
+            'data' => new MenuResource($menu),
+        ], 200);
     }
 
     /**
@@ -133,5 +139,21 @@ class MenuController extends Controller
             'success' => true,
             'message' => 'Menu berhasil dihapus.',
         ], 200);
+    }
+
+    public function updateStatus(Request $request, Menu $menu)
+    {
+
+        $validated = $request->validate([
+            'is_available' => ['required', 'boolean'],
+        ]);
+
+        $menu->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status menu berhasil diperbarui',
+            'data' => new MenuResource($menu->fresh()),
+        ]);
     }
 }

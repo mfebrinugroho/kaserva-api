@@ -126,7 +126,10 @@ class Store extends Model
         return $query->when($search, function (Builder $query, string $search) {
             $query->where(function (Builder $q) use ($search) {
                 $q->where('name', 'ILIKE', "%{$search}%")
-                    ->orWhere('address', 'ILIKE', "%{$search}%");
+                    ->orWhere('address', 'ILIKE', "%{$search}%")
+                    ->orWhereHas('owner', function ($r) use ($search) {
+                        $r->where('name', 'ILIKE', "%{$search}%");
+                    });
             });
         });
     }

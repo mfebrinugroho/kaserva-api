@@ -45,6 +45,9 @@ class Menu extends Model
                 $q->where('name', 'ILIKE', "%{$search}%")
                     ->orWhere('price', 'ILIKE', "%{$search}%")
                     ->orWhere('description', 'ILIKE', "%{$search}%")
+                    ->orWhereHas('store', function ($r) use ($search) {
+                        $r->where('name', 'ILIKE', "%{$search}%");
+                    })
                     ->orWhereHas('category', function ($r) use ($search) {
                         $r->where('name', 'ILIKE', "%{$search}%");
                     });

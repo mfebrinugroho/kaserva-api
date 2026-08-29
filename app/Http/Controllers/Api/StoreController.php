@@ -236,7 +236,7 @@ class StoreController extends Controller
 
     public function options()
     {
-        $stores = Store::select('id', 'name')->get();
+        $stores = Store::select('id', 'name')->where('is_active', true)->get();
 
         return response()->json([
             'success' => true,

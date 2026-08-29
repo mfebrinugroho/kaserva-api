@@ -25,6 +25,7 @@ class MenuCategoryController extends Controller
         if ($user->hasRole(UserRole::SuperAdmin)) {
             $menu_categories = MenuCategory::with('store')
                 ->search($search)
+                ->orderBy('is_active', 'DESC')
                 ->paginate($perPage)
                 ->withQueryString();
         } else {
@@ -150,5 +151,21 @@ class MenuCategoryController extends Controller
             'message' => 'List Data Kategori Menu',
             'data' => MenuCategoryOptionResource::collection($menu_categories),
         ], 200);
+    }
+
+    public function updateStatus(Request $request, MenuCategory $menu_category)
+    {
+
+        $validated = $request->validate([
+            'is_active' => ['required', 'boolean'],
+        ]);
+
+        $menu_category->update($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status menu berhasil diperbarui',
+            'data' => new MenuCategoryResource($menu_category->fresh()),
+        ]);
     }
 }

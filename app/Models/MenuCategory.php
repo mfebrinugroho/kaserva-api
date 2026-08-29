@@ -29,6 +29,7 @@ class MenuCategory extends Model
         return $query->when($search, function (Builder $query, string $search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'ILIKE', "%{$search}%")
+                    ->orWhere('sort_order', 'ILIKE', "%{$search}%")
                     ->orWhereHas('store', function ($r) use ($search) {
                         $r->where('name', 'ILIKE', "%{$search}%");
                     });

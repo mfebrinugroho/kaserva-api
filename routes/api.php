@@ -55,9 +55,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/user/active-store', [UserController::class, 'activeStore']);
 
         Route::apiResource('menus', MenuController::class);
+        Route::patch('/menus/{menu}/status-available', [MenuController::class, 'updateStatus']);
 
         Route::get('/menu-categories/options', [MenuCategoryController::class, 'options']);
         Route::apiResource('menu-categories', MenuCategoryController::class);
+        Route::patch('/menu-categories/{menu_category}/status', [MenuCategoryController::class, 'updateStatus']);
     });
 
     // Admin
