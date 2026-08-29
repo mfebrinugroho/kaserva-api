@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\MenuCategoryOptionResource;
 use App\Http\Resources\MenuCategoryResource;
 use App\Models\MenuCategory;
 use Illuminate\Http\Request;
@@ -112,6 +113,42 @@ class MenuCategoryController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Kategori menu berhasil dihapus',
+        ], 200);
+    }
+
+    public function options(Request $request)
+    {
+        $user = $request->user();
+
+        $request->validate([
+            'store_id' => ['required', 'exists:stores,id'],
+        ]);
+
+        $storeId = $request->store_id;
+
+        // if ($user->role->name === 'super-admin') {
+        //     $request->validate([
+        //         'store_id' => ['required', 'exists:stores,id'],
+        //     ]);
+
+        //     $storeId = $request->store_id;
+        // } else {
+        //     $storeId = $user->store_id;
+
+        //     if (!$storeId) {
+        //         return response()->json([
+        //             'success' => false,
+        //             'message' => 'Toko aktif belum dipilih.',
+        //         ], 422);
+        //     }
+        // }
+
+        $menu_categories = MenuCategory::select('id', 'store_id', 'name')->where('store_id', $storeId)->orderBy('name')->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'List Data Kategori Menu',
+            'data' => MenuCategoryOptionResource::collection($menu_categories),
         ], 200);
     }
 }

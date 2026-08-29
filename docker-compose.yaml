@@ -1,5 +1,6 @@
 services:
   app:
+    image: mfebrinugroho/kaserva-api
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,7 +12,7 @@ services:
 
     volumes:
       - .:/var/www/html
-      - vendor:/var/www/vendor
+      - vendor:/var/www/html/vendor
 
     depends_on:
       postgres:

@@ -55,6 +55,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/user/active-store', [UserController::class, 'activeStore']);
 
         Route::apiResource('menus', MenuController::class);
+
+        Route::get('/menu-categories/options', [MenuCategoryController::class, 'options']);
         Route::apiResource('menu-categories', MenuCategoryController::class);
     });
 
