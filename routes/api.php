@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\MenuController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\StoreController;
+use App\Http\Controllers\Api\StoreOperatingHourController;
 use App\Http\Controllers\Api\StoreOwnerController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
@@ -44,9 +45,23 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:owner,super-admin')->group(function () {
         Route::get('/stores/options', [StoreController::class, 'options']);
         Route::apiResource('stores', StoreController::class);
-        Route::patch('/stores/{store}/status', [StoreController::class, 'updateStatus']);
-        Route::patch('/stores/{store}/status-operational', [StoreController::class, 'updateStatusOperational']);
-        Route::patch('/stores/{store}/status-order', [StoreController::class, 'updateStatusOrder']);
+
+        Route::prefix('stores/{store}')->group(function () {
+
+            Route::patch('/status', [StoreController::class, 'updateStatus']);
+            Route::patch('/status-operational', [StoreController::class, 'updateStatusOperational']);
+            Route::patch('/status-order', [StoreController::class, 'updateStatusOrder']);
+
+            Route::get(
+                '/operating-hours',
+                [StoreOperatingHourController::class, 'index']
+            );
+
+            Route::put(
+                '/operating-hours',
+                [StoreOperatingHourController::class, 'update']
+            );
+        });
         Route::post('/stores/store-owner', [StoreOwnerController::class, 'addOwner']);
         Route::get('/stores-owners/available-users', [StoreOwnerController::class, 'availableUsers']);
         Route::get('/stores-owners/available-stores', [StoreOwnerController::class, 'availableStores']);

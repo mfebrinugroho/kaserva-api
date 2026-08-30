@@ -18,9 +18,11 @@ class StoreOperatingHourResource extends JsonResource
         return [
             'id' => $this->id,
             'store_id' => $this->store_id,
-            'day_of_week' => $this->day_of_week,
+            'day_of_week' => $this->day_of_week->value,
+            'day_name' => $this->day_of_week->label(),
             'open_time' => Carbon::parse($this->open_time)->format('H:i'),
             'close_time' => Carbon::parse($this->close_time)->format('H:i'),
+            'is_open' => $this->is_open,
         ];
     }
 }
