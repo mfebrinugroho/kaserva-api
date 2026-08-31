@@ -33,7 +33,7 @@ test('Super admin can get users', function () {
     ->create();
 
   // Act = Jalankan sesuatu
-  $response = $this->getJson('/api/users');
+  $response = $this->getJson('/api/v1/staff/users');
 
   // Assert = Pastikan hasilnya benar
   $response->assertOk();
@@ -49,7 +49,7 @@ test('user can be created', function () {
   ]);
 
   // ACT
-  $response = $this->postJson('/api/users', [
+  $response = $this->postJson('/api/v1/staff/users', [
     'name' => 'Puput',
     'email' => 'puput@example.com',
     'password' => 'password',
@@ -84,7 +84,7 @@ test('user can be updated', function () {
 
   // ACT
   $response = $this->patchJson(
-    "/api/users/{$user->id}",
+    "/api/v1/staff/users/{$user->id}",
     [
       'name' => 'Puput Kurniawati',
       'email' => 'puput@example.com',
@@ -117,7 +117,7 @@ test('user can see detail user', function () {
   ]);
 
   // ACT
-  $response = $this->getJson("/api/users/{$user->id}");
+  $response = $this->getJson("/api/v1/staff/users/{$user->id}");
 
   // ASSERT
   $response
@@ -141,7 +141,7 @@ test('user can be deleted', function () {
   Sanctum::actingAs($this->superAdminUser);
 
   $response = $this->deleteJson(
-    "/api/users/{$user->id}"
+    "/api/v1/staff/users/{$user->id}"
   );
 
   $response

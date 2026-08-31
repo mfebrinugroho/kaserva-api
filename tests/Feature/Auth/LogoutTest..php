@@ -23,6 +23,6 @@ it('can logout', function () {
 it('guest cannot logout', function () {
 
   $this
-    ->postJson('/api/logout')
+    ->postJson('/api/v1/staff/logout')
     ->assertUnauthorized();
 });

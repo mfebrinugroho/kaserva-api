@@ -9,7 +9,7 @@ it('can login', function () {
     'password' => bcrypt('password'),
   ]);
 
-  $response = $this->postJson('/api/login', [
+  $response = $this->postJson('/api/v1/staff/login', [
     'email' => 'user@test.com',
     'password' => 'password',
   ]);
@@ -33,7 +33,7 @@ it('cannot login with wrong password', function () {
     'password' => bcrypt('password'),
   ]);
 
-  $response = $this->postJson('/api/login', [
+  $response = $this->postJson('/api/v1/staff/login', [
     'email' => 'user@test.com',
     'password' => '123456',
   ]);
@@ -43,7 +43,7 @@ it('cannot login with wrong password', function () {
 
 it('cannot login with unknown email', function () {
 
-  $response = $this->postJson('/api/login', [
+  $response = $this->postJson('/api/v1/staff/login', [
     'email' => 'unknown@test.com',
     'password' => 'password',
   ]);

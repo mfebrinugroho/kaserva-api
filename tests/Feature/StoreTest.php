@@ -26,7 +26,7 @@ test('Super admin can get stores', function () {
     ->create();
 
   // Act = Jalankan sesuatu
-  $response = $this->getJson('/api/stores');
+  $response = $this->getJson('/api/v1/staff/stores');
 
   // Assert = Pastikan hasilnya benar
   $response->assertOk();
@@ -37,7 +37,7 @@ test('store can be created', function () {
   Sanctum::actingAs($this->superAdminUser);
 
   // ACT
-  $response = $this->postJson('/api/stores', [
+  $response = $this->postJson('/api/v1/staff/stores', [
     'name' => 'Toko Baru',
     'slug' => 'toko-baru',
     'description' => 'Toko baru untuk mengetest sebuah sistem',
