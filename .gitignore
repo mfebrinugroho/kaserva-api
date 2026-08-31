@@ -1,8 +1,6 @@
 .DS_Store
 .env
-.env.backup
-.env.production
-.env.testing
+.env.*
 cloudrun.env.yaml
 kaserva-gcloud-run.md
 .phpactor.json
