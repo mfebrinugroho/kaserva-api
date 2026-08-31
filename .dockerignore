@@ -1,8 +1,10 @@
-/node_modules
-/vendor
-.env
 .git
-/public/hot
-/public/storage
-/storage/*.key
-.phpunit.result.cache
+.github
+.env
+.env.*
+node_modules
+vendor
+storage/logs/*
+tests
+README.md
+kaserva-gcloud-run.md

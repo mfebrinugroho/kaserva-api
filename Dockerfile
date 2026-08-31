@@ -1,43 +1,55 @@
-# FROM php:8.2-cli
+FROM php:8.2-apache
 
-# RUN apt-get update && apt-get install -y \
-#   git \
-#   curl \
-#   unzip \
-#   libpq-dev \
-#   libzip-dev \
-#   && docker-php-ext-install pdo_pgsql \
-#   && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+  libpq-dev \
+  libicu-dev \
+  libzip-dev \
+  libonig-dev \
+  libxml2-dev \
+  unzip \
+  git \
+  && docker-php-ext-install \
+  pdo_pgsql \
+  mbstring \
+  bcmath \
+  intl \
+  zip \
+  xml \
+  && rm -rf /var/lib/apt/lists/*
 
-# COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+RUN a2enmod rewrite
 
-# WORKDIR /var/www/html
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# COPY . .
+WORKDIR /var/www/html
 
-# RUN composer install \
-#   --no-dev \
-#   --optimize-autoloader \
-#   --no-interaction
+COPY composer.json composer.lock ./
 
-# RUN chmod -R 775 storage bootstrap/cache
-
-# CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
-
-FROM richarvey/nginx-php-fpm:3.1.6
+RUN composer install \
+  --no-dev \
+  --no-interaction \
+  --prefer-dist \
+  --no-scripts
 
 COPY . .
 
-ENV SKIP_COMPOSER 1
-ENV WEBROOT /var/www/html/public
-ENV PHP_ERRORS_STDERR 1
-ENV RUN_SCRIPTS 1
-ENV REAL_IP_HEADER 1
+RUN composer dump-autoload --optimize \
+  && php artisan package:discover --ansi
 
-ENV APP_ENV production
-ENV APP_DEBUG false
-ENV LOG_CHANNEL stderr
+RUN chown -R www-data:www-data storage bootstrap/cache \
+  && chmod -R 775 storage bootstrap/cache
 
-ENV COMPOSER_ALLOW_SUPERUSER 1
+RUN sed -ri \
+  -e 's!/var/www/html!/var/www/html/public!g' \
+  /etc/apache2/sites-available/*.conf
 
-CMD ["/start.sh"]
+RUN sed -ri \
+  -e 's/AllowOverride None/AllowOverride All/g' \
+  /etc/apache2/apache2.conf
+
+RUN sed -i 's/Listen 80/Listen 8080/' /etc/apache2/ports.conf \
+  && sed -i 's/:80>/:8080>/' /etc/apache2/sites-available/000-default.conf
+
+EXPOSE 8080
+
+CMD ["apache2-foreground"]

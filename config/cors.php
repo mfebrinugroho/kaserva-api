@@ -21,7 +21,7 @@ return [
 
     'allowed_origins' => [
         'http://localhost:5173',
-        'https://orderkuy-admin-panel.vercel.app',
+        'https://kaserva-admin.vercel.app/',
     ],
 
     'allowed_origins_patterns' => [],

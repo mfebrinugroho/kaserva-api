@@ -3,6 +3,8 @@
 .env.backup
 .env.production
 .env.testing
+cloudrun.env.yaml
+kaserva-gcloud-run.md
 .phpactor.json
 .phpunit.result.cache
 /.fleet
