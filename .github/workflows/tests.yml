@@ -1,10 +1,13 @@
 name: tests
 
 on:
+  workflow_call:
+
   push:
     branches:
       - develop
-      - main
+      # - main
+
   pull_request:
     branches:
       - develop
