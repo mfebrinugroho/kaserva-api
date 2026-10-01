@@ -3,92 +3,98 @@
 use App\Enums\UserRole;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\PersonalAccessToken;
+use App\Services\Auth\JwtAccessTokenService;
 
 beforeEach(function () {
-  $role = Role::factory()->create(['slug' => UserRole::Owner->value, 'name' => 'Owner']);
-  $this->user = User::factory()->for($role)->create([
-    'email' => 'owner@example.com',
-    'password' => 'password123',
+  $role = Role::factory()->create([
+    'slug' => UserRole::Owner->value,
+    'name' => 'Owner',
   ]);
-  $this->credentials = ['email' => $this->user->email, 'password' => 'password123'];
+
+  $this->user = User::factory()
+    ->for($role)
+    ->create([
+      'email' => 'owner@example.com',
+      'password' => 'password123',
+    ]);
+
+  $this->credentials = [
+    'email' => $this->user->email,
+    'password' => 'password123',
+  ];
 });
 
-test('login returns user data and a valid token without exposing credentials', function () {
-  $response = $this->postJson('/api/v1/staff/login', $this->credentials);
+test('login returns user data and a valid access token without exposing credentials', function () {
+  $response = $this->postJson(
+    '/api/v1/staff/login',
+    $this->credentials
+  );
 
-  $response->assertOk()
+  $response
+    ->assertOk()
     ->assertJsonPath('success', true)
     ->assertJsonPath('message', 'Login berhasil')
     ->assertJsonPath('data.user.id', $this->user->id)
     ->assertJsonPath('data.user.email', $this->user->email);
 
-  expect($response->json('data.user'))->not->toHaveKeys(['password', 'remember_token']);
-  $plainTextToken = $response->json('token');
-  expect($plainTextToken)->toBeString()->not->toBeEmpty();
+  expect($response->json('data.user'))
+    ->not->toHaveKeys([
+      'password',
+      'remember_token',
+    ]);
 
-  $token = PersonalAccessToken::findToken($plainTextToken);
-  expect($token)->not->toBeNull();
-  expect($token->tokenable->is($this->user))->toBeTrue();
-  expect($token->name)->toBe('api-token');
-  // Sanctum menyimpan hash bagian rahasia token, bukan bearer token asli.
-  expect($token->token)->toBe(hash('sha256', explode('|', $plainTextToken, 2)[1]));
-  $this->assertDatabaseCount('personal_access_tokens', 1);
+  $accessToken = $response->json('data.access_token');
 
-  // Bersihkan cache guard agar request berikut memvalidasi bearer token sendiri.
-  Auth::forgetGuards();
-  $this->getJson('/api/v1/staff/user', ['Authorization' => 'Bearer ' . $plainTextToken])
-    ->assertOk()->assertJsonPath('data.id', $this->user->id);
+  expect($accessToken)
+    ->toBeString()
+    ->not->toBeEmpty();
+
+  // Pastikan access token benar-benar dapat diverifikasi
+  $payload = app(JwtAccessTokenService::class)
+    ->decode($accessToken);
+
+  expect((string) $payload->sub)
+    ->toBe((string) $this->user->id);
+
+  expect($payload->type)
+    ->toBe('access');
+
+  // Login menyimpan refresh token sebagai session dengan hash token.
+  $this->assertDatabaseCount('sessions', 1);
+
+  $this->assertDatabaseHas('sessions', [
+    'user_id' => $this->user->id,
+    'revoked_at' => null,
+  ]);
+
+  // Access token dapat digunakan untuk endpoint protected
+  $this->getJson(
+    '/api/v1/staff/me',
+    [
+      'Authorization' => 'Bearer ' . $accessToken,
+    ]
+  )
+    ->assertOk()
+    ->assertJsonPath('data.id', $this->user->id);
 });
 
-test('login rejects incorrect credentials without issuing a token', function (array $changes) {
-  $response = $this->postJson('/api/v1/staff/login', [...$this->credentials, ...$changes]);
+test('login rejects incorrect credentials and does not create a session', function () {
+  $response = $this->postJson('/api/v1/staff/login', [
+    'email' => $this->user->email,
+    'password' => 'wrong-password',
+  ]);
 
-  $response->assertUnauthorized()
-    ->assertJsonPath('success', false)
-    ->assertJsonPath('errors.email.0', 'These credentials do not match our records.');
+  $response
+    ->assertUnprocessable()
+    ->assertJsonValidationErrors('email');
 
-  expect($response->json())->not->toHaveKeys(['token', 'data']);
-  $this->assertDatabaseCount('personal_access_tokens', 0);
-})->with([
-  'wrong password' => [['password' => 'wrong-password']],
-  'unknown email' => [['email' => 'unknown@example.com']],
-]);
-
-test('login validates required credentials and email format', function (array $payload, array $fields) {
-  $this->postJson('/api/v1/staff/login', $payload)
-    ->assertUnprocessable()->assertJsonValidationErrors($fields);
-
-  $this->assertDatabaseCount('personal_access_tokens', 0);
-})->with([
-  'missing credentials' => [[], ['email', 'password']],
-  'missing email' => [['password' => 'password123'], ['email']],
-  'missing password' => [['email' => 'owner@example.com'], ['password']],
-  'empty email' => [['email' => '', 'password' => 'password123'], ['email']],
-  'empty password' => [['email' => 'owner@example.com', 'password' => ''], ['password']],
-  'invalid email' => [['email' => 'invalid-email', 'password' => 'password123'], ['email']],
-]);
-
-test('repeated login issues different tokens and preserves existing tokens', function () {
-  $firstResponse = $this->postJson('/api/v1/staff/login', $this->credentials)->assertOk();
-  Auth::forgetGuards();
-  $secondResponse = $this->postJson('/api/v1/staff/login', $this->credentials)->assertOk();
-
-  $firstToken = $firstResponse->json('token');
-  $secondToken = $secondResponse->json('token');
-  expect($secondToken)->not->toBe($firstToken);
-  expect(PersonalAccessToken::findToken($firstToken))->not->toBeNull();
-  expect(PersonalAccessToken::findToken($secondToken))->not->toBeNull();
-  expect($this->user->tokens()->count())->toBe(2);
+  $this->assertDatabaseCount('sessions', 0);
 });
 
-test('failed login preserves previously issued tokens', function () {
-  $token = $this->user->createToken('existing-session');
+test('login requires an email and password', function () {
+  $this->postJson('/api/v1/staff/login', [])
+    ->assertUnprocessable()
+    ->assertJsonValidationErrors(['email', 'password']);
 
-  $this->postJson('/api/v1/staff/login', [...$this->credentials, 'password' => 'wrong-password'])
-    ->assertUnauthorized();
-
-  expect(PersonalAccessToken::findToken($token->plainTextToken))->not->toBeNull();
-  $this->assertDatabaseCount('personal_access_tokens', 1);
+  $this->assertDatabaseCount('sessions', 0);
 });

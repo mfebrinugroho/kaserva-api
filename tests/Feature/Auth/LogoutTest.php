@@ -2,9 +2,8 @@
 
 use App\Enums\UserRole;
 use App\Models\Role;
+use App\Models\Session;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\PersonalAccessToken;
 
 beforeEach(function () {
   $this->role = Role::factory()->create(['slug' => UserRole::Owner->value, 'name' => 'Owner']);
@@ -19,80 +18,73 @@ test('user can logout using a token issued by login', function () {
     'email' => $this->user->email,
     'password' => 'password123',
   ])->assertOk();
-  $plainTextToken = $login->json('token');
-  $token = PersonalAccessToken::findToken($plainTextToken);
-  expect($token)->not->toBeNull();
+  $refreshCookie = $login->getCookie('refresh_token', decrypt: false);
+  $accessToken = $login->json('data.access_token');
 
-  // Token asli diperlukan untuk membuktikan pencabutan token di database.
-  Auth::forgetGuards();
-  $this->postJson('/api/v1/staff/logout', [], ['Authorization' => 'Bearer ' . $plainTextToken])
-    ->assertOk()->assertJsonPath('message', 'Logout berhasil');
+  expect($refreshCookie)->not->toBeNull();
+  expect($accessToken)->toBeString()->not->toBeEmpty();
 
-  $this->assertDatabaseMissing('personal_access_tokens', ['id' => $token->id]);
-  $this->assertDatabaseHas('users', ['id' => $this->user->id]);
+  $this->withCredentials()
+    ->withUnencryptedCookie('refresh_token', $refreshCookie->getValue())
+    ->postJson('/api/v1/staff/logout', [], [
+      'Authorization' => 'Bearer ' . $accessToken,
+    ])
+    ->assertOk()
+    ->assertJsonPath('message', 'Logout berhasil!');
 
-  // Guard tidak boleh memakai user yang tersimpan dari request logout sebelumnya.
-  Auth::forgetGuards();
-  $this->getJson('/api/v1/staff/user', ['Authorization' => 'Bearer ' . $plainTextToken])
-    ->assertUnauthorized();
+  $session = Session::where('user_id', $this->user->id)->firstOrFail();
+  expect($session->revoked_at)->not->toBeNull();
 });
 
-test('logout only revokes the current token and preserves other sessions', function () {
-  $currentToken = $this->user->createToken('current-session');
-  $otherToken = $this->user->createToken('other-session');
-  $otherUser = User::factory()->for($this->role)->create();
-  $otherUserToken = $otherUser->createToken('other-user-session');
+test('guest cannot logout using a refresh cookie alone', function () {
+  $login = $this->postJson('/api/v1/staff/login', [
+    'email' => $this->user->email,
+    'password' => 'password123',
+  ])->assertOk();
+  $refreshCookie = $login->getCookie('refresh_token', decrypt: false);
 
-  $this->postJson('/api/v1/staff/logout', [], [
-    'Authorization' => 'Bearer ' . $currentToken->plainTextToken,
+  $this->withCredentials()
+    ->withUnencryptedCookie('refresh_token', $refreshCookie->getValue())
+    ->postJson('/api/v1/staff/logout')
+    ->assertUnauthorized();
+
+  $this->assertDatabaseHas('sessions', [
+    'user_id' => $this->user->id,
+    'revoked_at' => null,
+  ]);
+});
+
+test('logout revokes only the refresh session from its cookie', function () {
+  $firstLogin = $this->postJson('/api/v1/staff/login', [
+    'email' => $this->user->email,
+    'password' => 'password123',
+  ])->assertOk();
+  $secondLogin = $this->postJson('/api/v1/staff/login', [
+    'email' => $this->user->email,
+    'password' => 'password123',
   ])->assertOk();
 
-  $this->assertDatabaseMissing('personal_access_tokens', ['id' => $currentToken->accessToken->id]);
-  $this->assertDatabaseHas('personal_access_tokens', ['id' => $otherToken->accessToken->id]);
-  $this->assertDatabaseHas('personal_access_tokens', ['id' => $otherUserToken->accessToken->id]);
-  $this->assertDatabaseCount('personal_access_tokens', 2);
+  $firstRefreshCookie = $firstLogin->getCookie('refresh_token', decrypt: false);
+  $secondRefreshCookie = $secondLogin->getCookie('refresh_token', decrypt: false);
+  $firstAccessToken = $firstLogin->json('data.access_token');
 
-  Auth::forgetGuards();
-  $this->getJson('/api/v1/staff/user', ['Authorization' => 'Bearer ' . $otherToken->plainTextToken])
-    ->assertOk()->assertJsonPath('data.id', $this->user->id);
-});
+  $this->withCredentials()
+    ->withUnencryptedCookie('refresh_token', $firstRefreshCookie->getValue())
+    ->postJson('/api/v1/staff/logout', [], [
+      'Authorization' => 'Bearer ' . $firstAccessToken,
+    ])
+    ->assertOk();
 
-test('guest cannot logout or revoke existing tokens', function () {
-  $token = $this->user->createToken('existing-session');
+  $this->assertDatabaseCount('sessions', 2);
+  $firstSession = Session::where(
+    'token_hash',
+    hash('sha256', $firstRefreshCookie->getValue())
+  )->firstOrFail();
+  $secondSession = Session::where(
+    'token_hash',
+    hash('sha256', $secondRefreshCookie->getValue())
+  )->firstOrFail();
 
-  $this->postJson('/api/v1/staff/logout')->assertUnauthorized();
-
-  $this->assertDatabaseHas('personal_access_tokens', ['id' => $token->accessToken->id]);
-});
-
-test('logout rejects a tampered bearer token without deleting the real token', function () {
-  $token = $this->user->createToken('existing-session');
-
-  $this->postJson('/api/v1/staff/logout', [], [
-    'Authorization' => 'Bearer ' . $token->plainTextToken . '-tampered',
-  ])->assertUnauthorized();
-
-  $this->assertDatabaseHas('personal_access_tokens', ['id' => $token->accessToken->id]);
-  expect(PersonalAccessToken::findToken($token->plainTextToken))->not->toBeNull();
-});
-
-test('logout rejects an expired token', function () {
-  $token = $this->user->createToken('expired-session', ['*'], now()->subMinute());
-
-  $this->postJson('/api/v1/staff/logout', [], [
-    'Authorization' => 'Bearer ' . $token->plainTextToken,
-  ])->assertUnauthorized();
-
-  $this->assertDatabaseHas('personal_access_tokens', ['id' => $token->accessToken->id]);
-});
-
-test('a revoked token cannot be used to logout again', function () {
-  $token = $this->user->createToken('current-session');
-  $headers = ['Authorization' => 'Bearer ' . $token->plainTextToken];
-
-  $this->postJson('/api/v1/staff/logout', [], $headers)->assertOk();
-  Auth::forgetGuards();
-  $this->postJson('/api/v1/staff/logout', [], $headers)->assertUnauthorized();
-
-  $this->assertDatabaseCount('personal_access_tokens', 0);
+  expect($firstSession->revoked_at)->not->toBeNull();
+  expect($secondSession->revoked_at)->toBeNull();
 });

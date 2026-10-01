@@ -14,9 +14,9 @@ class RoleMiddleware
      * @param  Closure(Request): (Response)  $next
      * @param string ...$roles
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        $user = $request->user();
+        $user = $request->attributes->get('user');
 
         if (! $user) {
             return response()->json([

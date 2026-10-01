@@ -9,12 +9,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -52,6 +51,16 @@ class User extends Authenticatable
         ];
     }
 
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims(): array
+    {
+        return [];
+    }
+
     public function posts()
     {
         return $this->hasMany(Post::class);
@@ -65,6 +74,11 @@ class User extends Authenticatable
     public function stores()
     {
         return $this->belongsToMany(Store::class, 'store_users');
+    }
+
+    public function sessions()
+    {
+        return $this->hasMany(Session::class);
     }
 
     public function hasPermission(string $permission): bool

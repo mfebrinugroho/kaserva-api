@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\Staff\StoreController;
 use App\Http\Controllers\Api\V1\Staff\StoreOperatingHourController;
 use App\Http\Controllers\Api\V1\Staff\StoreOwnerController;
 use App\Http\Controllers\AuthController;
+use App\Http\Middleware\AuthenticateJwt;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -22,11 +23,14 @@ Route::prefix('v1')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware('jwt')->group(function () {
       // Get User Login
-      Route::get('/user', [AuthController::class, 'me']);
+      Route::get('/me', [AuthController::class, 'me']);
+      // Refresh Token
+      Route::post('/refresh', [AuthController::class, 'refresh']);
       // Logout
       Route::post('/logout', [AuthController::class, 'logout']);
+
       // Role
       Route::apiResource('roles', RoleController::class);
 
