@@ -63,10 +63,9 @@ jobs:
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Copy Environment File
-       run: |
+        run: |
           cp .env.example .env
           cp .env.testing.example .env.testing
-
 
       - name: Generate Application Key
         run: php artisan key:generate --env=testing
@@ -84,5 +83,5 @@ jobs:
 
           JWT_ACCESS_SECRET: testing-access-secret-testing-access-secret
           JWT_REFRESH_SECRET: testing-refresh-secret-testing-refresh-secret
-          
+
         run: ./vendor/bin/pest
