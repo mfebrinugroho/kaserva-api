@@ -18,6 +18,7 @@ class AuthenticateJwt
 
     if (! $header || ! str_starts_with($header, 'Bearer ')) {
       return response()->json([
+        'success' => false,
         'message' => 'Unauthenticated.',
       ], 401);
     }
@@ -28,12 +29,14 @@ class AuthenticateJwt
       $payload = $this->accessTokenService->decode($token);
     } catch (\Throwable $e) {
       return response()->json([
+        'success' => false,
         'message' => 'Invalid or expired access token.',
       ], 401);
     }
 
     if (($payload->type ?? null) !== 'access') {
       return response()->json([
+        'success' => false,
         'message' => 'Invalid token type.',
       ], 401);
     }
@@ -42,6 +45,7 @@ class AuthenticateJwt
 
     if (! $user) {
       return response()->json([
+        'success' => false,
         'message' => 'User tidak ditemukan.',
       ], 401);
     }

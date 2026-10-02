@@ -14,19 +14,19 @@ beforeEach(function () {
 });
 
 test('user can logout using a token issued by login', function () {
-  $login = $this->postJson('/api/staff/login', [
+  $login = $this->postJson('/api/staff/auth/login', [
     'email' => $this->user->email,
     'password' => 'password123',
   ])->assertOk();
-  $refreshCookie = $login->getCookie('refresh_token', decrypt: false);
+  $refreshCookie = $login->getCookie('staff_refresh_token', decrypt: false);
   $accessToken = $login->json('data.access_token');
 
   expect($refreshCookie)->not->toBeNull();
   expect($accessToken)->toBeString()->not->toBeEmpty();
 
   $this->withCredentials()
-    ->withUnencryptedCookie('refresh_token', $refreshCookie->getValue())
-    ->postJson('/api/staff/logout', [], [
+    ->withUnencryptedCookie('staff_refresh_token', $refreshCookie->getValue())
+    ->postJson('/api/staff/auth/logout', [], [
       'Authorization' => 'Bearer ' . $accessToken,
     ])
     ->assertOk()
@@ -37,15 +37,15 @@ test('user can logout using a token issued by login', function () {
 });
 
 test('guest cannot logout using a refresh cookie alone', function () {
-  $login = $this->postJson('/api/staff/login', [
+  $login = $this->postJson('/api/staff/auth/login', [
     'email' => $this->user->email,
     'password' => 'password123',
   ])->assertOk();
-  $refreshCookie = $login->getCookie('refresh_token', decrypt: false);
+  $refreshCookie = $login->getCookie('staff_refresh_token', decrypt: false);
 
   $this->withCredentials()
-    ->withUnencryptedCookie('refresh_token', $refreshCookie->getValue())
-    ->postJson('/api/staff/logout')
+    ->withUnencryptedCookie('staff_refresh_token', $refreshCookie->getValue())
+    ->postJson('/api/staff/auth/logout')
     ->assertUnauthorized();
 
   $this->assertDatabaseHas('sessions', [
@@ -55,22 +55,22 @@ test('guest cannot logout using a refresh cookie alone', function () {
 });
 
 test('logout revokes only the refresh session from its cookie', function () {
-  $firstLogin = $this->postJson('/api/staff/login', [
+  $firstLogin = $this->postJson('/api/staff/auth/login', [
     'email' => $this->user->email,
     'password' => 'password123',
   ])->assertOk();
-  $secondLogin = $this->postJson('/api/staff/login', [
+  $secondLogin = $this->postJson('/api/staff/auth/login', [
     'email' => $this->user->email,
     'password' => 'password123',
   ])->assertOk();
 
-  $firstRefreshCookie = $firstLogin->getCookie('refresh_token', decrypt: false);
-  $secondRefreshCookie = $secondLogin->getCookie('refresh_token', decrypt: false);
+  $firstRefreshCookie = $firstLogin->getCookie('staff_refresh_token', decrypt: false);
+  $secondRefreshCookie = $secondLogin->getCookie('staff_refresh_token', decrypt: false);
   $firstAccessToken = $firstLogin->json('data.access_token');
 
   $this->withCredentials()
-    ->withUnencryptedCookie('refresh_token', $firstRefreshCookie->getValue())
-    ->postJson('/api/staff/logout', [], [
+    ->withUnencryptedCookie('staff_refresh_token', $firstRefreshCookie->getValue())
+    ->postJson('/api/staff/auth/logout', [], [
       'Authorization' => 'Bearer ' . $firstAccessToken,
     ])
     ->assertOk();

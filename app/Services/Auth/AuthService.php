@@ -46,4 +46,42 @@ class AuthService
       'refresh_token' => $refresh['token'],
     ];
   }
+
+  public function refresh(string $refreshToken): ?string
+  {
+    try {
+      $payload = $this->refreshTokenService->decode($refreshToken);
+    } catch (\Throwable $e) {
+      return null;
+    }
+
+    if (($payload->type ?? null) !== 'refresh') {
+      return null;
+    }
+
+    $tokenHash = hash('sha256', $refreshToken);
+
+    $storedToken = Session::where('jti', $payload->jti)
+      ->where('token_hash', $tokenHash)
+      ->whereNull('revoked_at')
+      ->first();
+
+    if (! $storedToken) {
+      return null;
+    }
+
+    if ($storedToken->expires_at->isPast()) {
+      return null;
+    }
+
+    $user = User::where('id', $storedToken->user_id)->first();
+
+    if (! $user) {
+      return null;
+    }
+
+    $accessToken = $this->accessTokenService->generate($user);
+
+    return $accessToken;
+  }
 }

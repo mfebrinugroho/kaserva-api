@@ -62,10 +62,10 @@ class AuthController extends Controller
         );
 
         $refreshCookie = cookie(
-            'refresh_token',
+            'staff_refresh_token',
             $tokens['refresh_token'],
             60 * 24 * 7,
-            '/',
+            '/api/staff/auth',
             null,
             app()->environment('production'),
             true,
@@ -85,7 +85,7 @@ class AuthController extends Controller
 
     public function refresh(Request $request): JsonResponse
     {
-        $refreshToken = $request->cookie('refresh_token');
+        $refreshToken = $request->cookie('staff_refresh_token');
 
         if (! $refreshToken) {
             return response()->json([
@@ -93,52 +93,18 @@ class AuthController extends Controller
             ], 401);
         }
 
-        try {
-            $payload = $this->refreshTokenService->decode($refreshToken);
-        } catch (\Throwable $e) {
+        $result = $this->authService->refresh($refreshToken);
+
+        if (!$result) {
             return response()->json([
-                'message' => 'Invalid or expired refresh token.',
+                'message' => 'Refresh token tidak valid atau sudah expired.',
             ], 401);
         }
-
-        if (($payload->type ?? null) !== 'refresh') {
-            return response()->json([
-                'message' => 'Invalid token type.',
-            ], 401);
-        }
-
-        $tokenHash = hash('sha256', $refreshToken);
-
-        $storedToken = Session::where('jti', $payload->jti)
-            ->where('token_hash', $tokenHash)
-            ->whereNull('revoked_at')
-            ->first();
-
-        if (! $storedToken) {
-            return response()->json([
-                'message' => 'Refresh token tidak valid.',
-            ], 401);
-        }
-
-        if ($storedToken->expires_at->isPast()) {
-            return response()->json([
-                'message' => 'Refresh token sudah expired.',
-            ], 401);
-        }
-
-        $user = User::where('id', $payload->sub)->first();
-
-        if (! $user) {
-            return response()->json([
-                'message' => 'User tidak ditemukan.',
-            ], 401);
-        }
-
-        $accessToken = $this->accessTokenService->generate($user);
 
         return response()->json([
-            'access_token' => $accessToken,
-            'expires_in' => config('jwt.access.ttl'),
+            'success' => true,
+            'message' => 'Access token berhasil diperbarui',
+            'access_token' => $result
         ]);
     }
 
@@ -165,7 +131,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $refreshToken = $request->cookie('refresh_token');
+        $refreshToken = $request->cookie('staff_refresh_token');
 
         $payload = $this->refreshTokenService->decode($refreshToken);
 
@@ -176,7 +142,8 @@ class AuthController extends Controller
 
 
         return response()->json([
+            'success' => true,
             'message' => 'Logout berhasil!',
-        ])->withoutCookie('refresh_token');
+        ])->withoutCookie('staff_refresh_token');
     }
 }
