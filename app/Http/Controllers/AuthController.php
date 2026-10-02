@@ -48,7 +48,7 @@ class AuthController extends Controller
         ]);
     }
 
-    public function login(Request $request)
+    public function login(Request $request): JsonResponse
     {
         $credentials = $request->validate([
             'email' => 'required|email',
@@ -78,10 +78,9 @@ class AuthController extends Controller
             'message' => 'Login berhasil',
             'data' => [
                 'access_token' =>  $tokens['access_token'],
-                'expires_in' => config('jwt.access.ttl'),
                 'user' => $tokens['user']
             ],
-        ])->withCookie($refreshCookie);
+        ], 200)->withCookie($refreshCookie);
     }
 
     public function refresh(Request $request): JsonResponse

@@ -26,7 +26,7 @@ beforeEach(function () {
 
 test('login returns user data and a valid access token without exposing credentials', function () {
   $response = $this->postJson(
-    '/api/v1/staff/login',
+    '/api/staff/login',
     $this->credentials
   );
 
@@ -69,7 +69,7 @@ test('login returns user data and a valid access token without exposing credenti
 
   // Access token dapat digunakan untuk endpoint protected
   $this->getJson(
-    '/api/v1/staff/me',
+    '/api/staff/me',
     [
       'Authorization' => 'Bearer ' . $accessToken,
     ]
@@ -79,20 +79,23 @@ test('login returns user data and a valid access token without exposing credenti
 });
 
 test('login rejects incorrect credentials and does not create a session', function () {
-  $response = $this->postJson('/api/v1/staff/login', [
+  $response = $this->postJson('/api/staff/login', [
     'email' => $this->user->email,
     'password' => 'wrong-password',
   ]);
 
   $response
-    ->assertUnprocessable()
-    ->assertJsonValidationErrors('email');
+    ->assertUnauthorized()
+    ->assertJson([
+      'success' => false,
+      'message' => 'Email atau password salah.',
+    ]);
 
   $this->assertDatabaseCount('sessions', 0);
 });
 
 test('login requires an email and password', function () {
-  $this->postJson('/api/v1/staff/login', [])
+  $this->postJson('/api/staff/login', [])
     ->assertUnprocessable()
     ->assertJsonValidationErrors(['email', 'password']);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Staff;
+namespace App\Http\Controllers\Api\Staff;
 
 use App\Enums\DayOfWeek;
 use App\Http\Controllers\Controller;
