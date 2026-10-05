@@ -25,7 +25,8 @@ class RoleMiddleware
             ], 401);
         }
 
-        $userRole = $request->user()->role->slug->value;
+        $userRole = $user->role->slug->value;
+
 
         if (! in_array($userRole, $roles, true)) {
             return response()->json([

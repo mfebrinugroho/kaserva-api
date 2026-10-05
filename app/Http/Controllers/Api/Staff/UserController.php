@@ -18,13 +18,13 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        Gate::authorize('viewAny', User::class);
+        // Gate::authorize('viewAny', User::class);
 
         $perPage = $request->get('limit', 10);
-
         $search = $request->get('search');
 
         $users = User::with('role')
+            ->orderBy('id', 'asc')
             ->search($search)
             ->paginate($perPage)
             ->withQueryString();
@@ -51,7 +51,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('create', User::class);
+        // Gate::authorize('create', User::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:225',
@@ -81,7 +81,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        Gate::authorize('view', $user);
+        // Gate::authorize('view', $user);
 
         $user->load('role');
 
@@ -97,7 +97,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        Gate::authorize('update', $user);
+        // Gate::authorize('update', $user);
 
         $validated = $request->validate([
             'name' => 'required|string|max:225',
@@ -106,7 +106,6 @@ class UserController extends Controller
                 'email',
                 Rule::unique('users')->ignore($user->id),
             ],
-            'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'required|integer|exists:roles,id',
         ]);
 
@@ -115,11 +114,6 @@ class UserController extends Controller
             'email' => $validated['email'],
             'role_id' => $validated['role_id'],
         ];
-
-        // password optional
-        if (!empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
-        }
 
         $user->update($data);
 
@@ -133,9 +127,17 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
-        Gate::authorize('delete', $user);
+        // Gate::authorize('delete', $user);
+        $me = $request->attributes->get('user');
+
+        if ($user->id === $me->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak dapat menghapus akun Anda sendiri.',
+            ], 403);
+        }
 
         $user->delete();
 

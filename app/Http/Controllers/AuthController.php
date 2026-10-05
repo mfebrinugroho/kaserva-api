@@ -7,7 +7,6 @@ use App\Models\Role;
 use App\Models\Session;
 use App\Models\User;
 use App\Services\Auth\AuthService;
-use App\Services\Auth\JwtAccessTokenService;
 use App\Services\Auth\JwtRefreshTokenService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -17,7 +16,6 @@ class AuthController extends Controller
     public function __construct(
         private AuthService $authService,
         private JwtRefreshTokenService $refreshTokenService,
-        private JwtAccessTokenService $accessTokenService
     ) {}
 
     public function register(Request $request)
@@ -87,6 +85,7 @@ class AuthController extends Controller
 
         if (! $refreshToken) {
             return response()->json([
+                'success' => false,
                 'message' => 'Refresh token tidak ditemukan.',
             ], 401);
         }
@@ -95,6 +94,7 @@ class AuthController extends Controller
 
         if (!$result) {
             return response()->json([
+                'success' => false,
                 'message' => 'Refresh token tidak valid atau sudah expired.',
             ], 401);
         }
@@ -118,6 +118,7 @@ class AuthController extends Controller
 
         if (! $user) {
             return response()->json([
+                'success' => false,
                 'message' => 'User tidak ditemukan.',
             ], 404);
         }

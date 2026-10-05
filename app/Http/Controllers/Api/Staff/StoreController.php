@@ -22,9 +22,8 @@ class StoreController extends Controller
      */
     public function index(Request $request)
     {
-        Gate::authorize('viewAny', Store::class);
-
-        $user = $request->user();
+        // Gate::authorize('viewAny', Store::class);
+        $user = $request->attributes->get('user');
 
         $perPage = $request->get('limit', 10);
 
@@ -62,7 +61,7 @@ class StoreController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('create', Store::class);
+        // Gate::authorize('create', Store::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:100',
@@ -100,7 +99,7 @@ class StoreController extends Controller
      */
     public function show(Store $store)
     {
-        Gate::authorize('view', $store);
+        // Gate::authorize('view', $store);
 
         // $store->load([
         //     'todayOperatingHour',
@@ -122,7 +121,7 @@ class StoreController extends Controller
      */
     public function update(Request $request, Store $store)
     {
-        Gate::authorize('update', $store);
+        // Gate::authorize('update', $store);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -165,7 +164,7 @@ class StoreController extends Controller
      */
     public function destroy(Store $store)
     {
-        Gate::authorize('delete', $store);
+        // Gate::authorize('delete', $store);
 
         if ($store->image) {
             $this->fileUploadService->delete($store->image);
@@ -185,7 +184,7 @@ class StoreController extends Controller
 
     public function updateStatus(Request $request, Store $store)
     {
-        Gate::authorize('updateStatus', $store);
+        // Gate::authorize('updateStatus', $store);
 
         $validated = $request->validate([
             'is_active' => ['required', 'boolean'],
@@ -202,7 +201,7 @@ class StoreController extends Controller
 
     public function updateStatusOperational(Request $request, Store $store)
     {
-        Gate::authorize('updateStatusOperational', $store);
+        // Gate::authorize('updateStatusOperational', $store);
 
         $validated = $request->validate([
             'is_open' => ['required', 'boolean'],
@@ -219,7 +218,7 @@ class StoreController extends Controller
 
     public function updateStatusOrder(Request $request, Store $store)
     {
-        Gate::authorize('updateStatusOrder', $store);
+        // Gate::authorize('updateStatusOrder', $store);
 
         $validated = $request->validate([
             'is_accept_order' => ['required', 'boolean'],

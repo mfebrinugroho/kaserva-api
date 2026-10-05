@@ -26,11 +26,9 @@ Route::prefix('staff')->group(function () {
     Route::prefix('auth')->group(function () {
       // Get User Login
       Route::get('/me', [AuthController::class, 'me']);
-
       // Logout
       Route::post('/logout', [AuthController::class, 'logout']);
     });
-
 
     // Role
     Route::apiResource('roles', RoleController::class);

@@ -15,6 +15,8 @@ class StoreResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->attributes->get('user');
+        $userRole = $user->hasRole(UserRole::SuperAdmin);
 
         return [
             'id' => $this->id,
@@ -47,7 +49,7 @@ class StoreResource extends JsonResource
                 $this->whenLoaded('users')
             ),
             'owner' => $this->when(
-                $request->user()->hasRole(UserRole::SuperAdmin),
+                $userRole,
                 fn() => new UserResource($this->owner->first())
             ),
         ];
