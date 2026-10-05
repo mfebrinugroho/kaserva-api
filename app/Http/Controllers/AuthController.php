@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\UserAuthResource;
-use App\Http\Resources\UserResource;
 use App\Models\Role;
 use App\Models\Session;
 use App\Models\User;
@@ -12,7 +11,6 @@ use App\Services\Auth\JwtAccessTokenService;
 use App\Services\Auth\JwtRefreshTokenService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -104,7 +102,9 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Access token berhasil diperbarui',
-            'access_token' => $result
+            'data' => [
+                'access_token' => $result,
+            ],
         ]);
     }
 

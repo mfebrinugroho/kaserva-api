@@ -19,14 +19,14 @@ Route::prefix('staff')->group(function () {
   Route::prefix('auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/refresh', [AuthController::class, 'refresh']);
   });
 
   Route::middleware('jwt')->group(function () {
     Route::prefix('auth')->group(function () {
       // Get User Login
       Route::get('/me', [AuthController::class, 'me']);
-      // Refresh Token
-      Route::post('/refresh', [AuthController::class, 'refresh']);
+
       // Logout
       Route::post('/logout', [AuthController::class, 'logout']);
     });
