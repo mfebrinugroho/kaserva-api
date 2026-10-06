@@ -149,7 +149,8 @@ class UserController extends Controller
 
     public function activeStore(Request $request)
     {
-        $user = $request->user();
+        // $user = $request->user();
+        $user = $request->attributes->get('user');
 
         $validated = $request->validate([
             'store_id' => ['required', 'exists:stores,id'],
@@ -169,7 +170,7 @@ class UserController extends Controller
         // Refresh agar relasi store ikut ter-update
         $user = User::select('id', 'name', 'email', 'store_id', 'role_id')
             ->with('stores:id,slug,name', 'role:id,slug,name', 'role.permissions:id,slug,name')
-            ->find($request->user()->id);
+            ->find($request->attributes->get('user')->id);
 
         return response()->json([
             'success' => true,
