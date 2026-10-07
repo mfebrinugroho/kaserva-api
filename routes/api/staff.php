@@ -34,12 +34,15 @@ Route::prefix('staff')->group(function () {
     Route::apiResource('roles', RoleController::class);
 
     // Super Admin
-    Route::middleware('role:super-admin')->group(function () {
+    Route::middleware('role:owner,super-admin')->group(function () {
       Route::apiResource('users', UserController::class);
     });
 
+
     // Owner
     Route::middleware('role:owner,super-admin')->group(function () {
+      Route::post('/users/active-store', [UserController::class, 'activeStore']);
+
       Route::get('/stores/options', [StoreController::class, 'options']);
       Route::apiResource('stores', StoreController::class);
 
@@ -65,7 +68,7 @@ Route::prefix('staff')->group(function () {
         Route::get('/available-stores', [StoreOwnerController::class, 'availableStores']);
       });
 
-      Route::post('/user/active-store', [UserController::class, 'activeStore']);
+
 
       Route::apiResource('menus', MenuController::class);
       Route::patch('/menus/{menu}/status-available', [MenuController::class, 'updateStatus']);

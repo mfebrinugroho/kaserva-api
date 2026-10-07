@@ -57,7 +57,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Jett Knives',
                 'email' => 'jett.superadmin@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 1,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -65,7 +65,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Astra Galaxy',
                 'email' => 'astra.owner@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -73,7 +73,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Fade Snake',
                 'email' => 'fade.owner@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 2,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -81,7 +81,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Chamber Sniper',
                 'email' => 'chamber.admin@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -89,7 +89,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Killjoy Bombbot',
                 'email' => 'killjoy.admin@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 3,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -97,7 +97,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Neon Speeder',
                 'email' => 'neon.customer@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 4,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -105,7 +105,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Sova Hunter',
                 'email' => 'sova.cashier@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 5,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -113,7 +113,7 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Yoru Shadow',
                 'email' => 'yoru.kitchen@gmail.com',
-                'password' => Hash::make('123'),
+                'password' => Hash::make(env("USER_PASSWORD_SEED")),
                 'role_id' => 6,
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -605,6 +605,12 @@ class DatabaseSeeder extends Seeder
 
         DB::table('permissions')->insert([
             [
+                'slug' => "user.viewAny",
+                'name' => "Lihat Semua User",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
                 'slug' => "user.view",
                 'name' => "Lihat User",
                 'created_at' => now(),
@@ -686,6 +692,10 @@ class DatabaseSeeder extends Seeder
             [
                 'role_id' => 1,
                 'permission_id' => 8,
+            ],
+            [
+                'role_id' => 1,
+                'permission_id' => 9,
             ],
             [
                 'role_id' => 2,

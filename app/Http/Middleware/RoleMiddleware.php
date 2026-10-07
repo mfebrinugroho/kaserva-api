@@ -16,7 +16,7 @@ class RoleMiddleware
      */
     public function handle(Request $request, Closure $next, string ...$roles): Response
     {
-        $user = $request->attributes->get('user');
+        $user = $request->user();
 
         if (! $user) {
             return response()->json([

@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Services\Auth\JwtAccessTokenService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthenticateJwt
@@ -50,8 +51,11 @@ class AuthenticateJwt
       ], 401);
     }
 
+    // Set authenticated user untuk Laravel Auth / Gate / Policy
+    Auth::setUser($user);
+
+    // Simpan payload JWT jika masih diperlukan
     $request->attributes->set('jwt_payload', $payload);
-    $request->attributes->set('user', $user);
 
     return $next($request);
   }

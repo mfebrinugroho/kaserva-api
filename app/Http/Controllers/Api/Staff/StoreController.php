@@ -23,7 +23,7 @@ class StoreController extends Controller
     public function index(Request $request)
     {
         // Gate::authorize('viewAny', Store::class);
-        $user = $request->attributes->get('user');
+        $user = $request->user();
 
         $perPage = $request->get('limit', 10);
 

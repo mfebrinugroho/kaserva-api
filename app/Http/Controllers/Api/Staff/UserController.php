@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserAuthResource;
-use App\Http\Resources\UserResource;
+use App\Http\Resources\Staff\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // Gate::authorize('viewAny', User::class);
+        Gate::authorize('viewAny', User::class);
 
         $perPage = $request->get('limit', 10);
         $search = $request->get('search');
@@ -66,8 +66,6 @@ class UserController extends Controller
             'password' => Hash::make($validated['password']),
             'role_id' => $validated['role_id'],
         ]);
-
-        // $user->load('role');
 
         return response()->json([
             'success' => true,
@@ -130,7 +128,8 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
         // Gate::authorize('delete', $user);
-        $me = $request->attributes->get('user');
+
+        $me = $request->user();
 
         if ($user->id === $me->id) {
             return response()->json([
@@ -149,8 +148,7 @@ class UserController extends Controller
 
     public function activeStore(Request $request)
     {
-        // $user = $request->user();
-        $user = $request->attributes->get('user');
+        $user = $request->user();
 
         $validated = $request->validate([
             'store_id' => ['required', 'exists:stores,id'],
@@ -170,7 +168,7 @@ class UserController extends Controller
         // Refresh agar relasi store ikut ter-update
         $user = User::select('id', 'name', 'email', 'store_id', 'role_id')
             ->with('stores:id,slug,name', 'role:id,slug,name', 'role.permissions:id,slug,name')
-            ->find($request->attributes->get('user')->id);
+            ->find($request->user()->id);
 
         return response()->json([
             'success' => true,
