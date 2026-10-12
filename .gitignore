@@ -26,3 +26,5 @@ Homestead.yaml
 npm-debug.log
 yarn-error.log
 gha-creds-*.json
+/database/seeders/DatabaseSeeder.php
+/docs/*.md

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Staff\User;
+namespace App\Http\Resources\Api\Staff\User;
 
 use App\Http\Resources\RoleMeResource;
 use App\Http\Resources\StoreResource;

@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserAuthResource;
-use App\Http\Resources\Staff\User\UserResource;
+use App\Http\Resources\Api\Staff\User\UserResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -51,7 +51,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // Gate::authorize('create', User::class);
+        Gate::authorize('create', User::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:225',
@@ -79,7 +79,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        // Gate::authorize('view', $user);
+        Gate::authorize('view', $user);
 
         $user->load('role');
 
@@ -95,7 +95,7 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Gate::authorize('update', $user);
+        Gate::authorize('update', $user);
 
         $validated = $request->validate([
             'name' => 'required|string|max:225',
@@ -127,7 +127,7 @@ class UserController extends Controller
      */
     public function destroy(Request $request, User $user)
     {
-        // Gate::authorize('delete', $user);
+        Gate::authorize('delete', $user);
 
         $me = $request->user();
 

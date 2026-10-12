@@ -1,11 +1,14 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\Staff\Auth;
 
+use App\Http\Resources\Api\Staff\Permission\PermissionResource;
+use App\Http\Resources\Api\Staff\Role\RoleResource;
+use App\Http\Resources\Api\Staff\Store\StoreMeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserAuthResource extends JsonResource
+class AuthMeResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,10 +22,10 @@ class UserAuthResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'store_id' => $this->store_id,
-            'role' => new RoleMeResource(
+            'role' => new RoleResource(
                 $this->whenLoaded('role')
             ),
-            'permissions' => PermissionMeResource::collection(
+            'permissions' => PermissionResource::collection(
                 $this->whenLoaded('role')?->permissions ?? collect()
             ),
             'stores' => StoreMeResource::collection(
