@@ -1,8 +1,11 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\Staff\Store;
 
 use App\Enums\UserRole;
+use App\Http\Resources\Api\Staff\Menu\MenuResource;
+use App\Http\Resources\Api\Staff\MenuCategory\MenuCategoryResource;
+use App\Http\Resources\Api\Staff\User\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,7 +18,7 @@ class StoreResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $user = $request->attributes->get('user');
+        $user = $request->user();
         $userRole = $user->hasRole(UserRole::SuperAdmin);
 
         return [

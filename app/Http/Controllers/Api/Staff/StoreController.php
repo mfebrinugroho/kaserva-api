@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Staff;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Staff\Store\StoreResource;
 use App\Http\Resources\StoreOptionResource;
-use App\Http\Resources\StoreResource;
 use App\Models\Store;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
@@ -22,7 +22,8 @@ class StoreController extends Controller
      */
     public function index(Request $request)
     {
-        // Gate::authorize('viewAny', Store::class);
+        Gate::authorize('viewAny', Store::class);
+
         $user = $request->user();
 
         $perPage = $request->get('limit', 10);
@@ -36,7 +37,11 @@ class StoreController extends Controller
                 ->paginate($perPage)
                 ->withQueryString();
         } else {
-            $stores = $user->stores()->search($search)->orderBy('id', 'asc')->paginate($perPage)->withQueryString();
+            $stores = $user->stores()
+                ->search($search)
+                ->orderBy('id', 'asc')
+                ->paginate($perPage)
+                ->withQueryString();
         }
 
         return response()->json([
@@ -61,7 +66,7 @@ class StoreController extends Controller
      */
     public function store(Request $request)
     {
-        // Gate::authorize('create', Store::class);
+        Gate::authorize('create', Store::class);
 
         $validated = $request->validate([
             'name' => 'required|string|max:100',
@@ -70,20 +75,6 @@ class StoreController extends Controller
             'phone' => 'nullable|string|max:20',
             'is_active' => 'required|boolean',
         ]);
-
-        // if ($request->hasFile('image')) {
-        //     $validated['image'] = $this->fileUploadService->upload(
-        //         $request->file('image'),
-        //         'images/stores/profile'
-        //     );
-        // }
-
-        // if ($request->hasFile('banner')) {
-        //     $validated['banner'] = $this->fileUploadService->upload(
-        //         $request->file('banner'),
-        //         'images/stores/banner'
-        //     );
-        // }
 
         $store = Store::create($validated);
 
@@ -99,15 +90,7 @@ class StoreController extends Controller
      */
     public function show(Store $store)
     {
-        // Gate::authorize('view', $store);
-
-        // $store->load([
-        //     'todayOperatingHour',
-        //     'menuCategories' => function ($query) {
-        //         $query->where('is_active', true)
-        //             ->with(['menus']);
-        //     },
-        // ]);
+        Gate::authorize('view', $store);
 
         return response()->json([
             'success' => true,
@@ -121,7 +104,7 @@ class StoreController extends Controller
      */
     public function update(Request $request, Store $store)
     {
-        // Gate::authorize('update', $store);
+        Gate::authorize('update', $store);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -164,7 +147,7 @@ class StoreController extends Controller
      */
     public function destroy(Store $store)
     {
-        // Gate::authorize('delete', $store);
+        Gate::authorize('delete', $store);
 
         if ($store->image) {
             $this->fileUploadService->delete($store->image);

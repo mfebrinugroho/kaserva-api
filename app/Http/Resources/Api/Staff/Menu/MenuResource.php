@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\Staff\Menu;
 
+use App\Http\Resources\Api\Staff\MenuCategory\MenuCategoryResource;
+use App\Http\Resources\Api\Staff\Store\StoreResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

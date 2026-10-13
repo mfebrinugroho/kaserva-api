@@ -2,8 +2,8 @@
 
 namespace App\Http\Resources\Api\Staff\User;
 
-use App\Http\Resources\RoleMeResource;
-use App\Http\Resources\StoreResource;
+use App\Http\Resources\Api\Staff\Role\RoleResource;
+use App\Http\Resources\Api\Staff\Store\StoreMeResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,10 +25,10 @@ class UserResource extends JsonResource
             'store_id' => $this->store_id,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'role' => new RoleMeResource(
+            'role' => new RoleResource(
                 $this->whenLoaded('role')
             ),
-            'stores' => StoreResource::collection(
+            'stores' => StoreMeResource::collection(
                 $this->whenLoaded('stores')
             )
         ];

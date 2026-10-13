@@ -42,7 +42,9 @@ class AuthenticateJwt
       ], 401);
     }
 
-    $user = User::where('id', $payload->sub)->first();
+    $user = User::select('id', 'name', 'email', 'email_verified_at', 'role_id', 'store_id', 'created_at', 'updated_at')
+      ->where('id', $payload->sub)
+      ->first();
 
     if (! $user) {
       return response()->json([
