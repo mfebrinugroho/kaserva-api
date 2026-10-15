@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Staff;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\MenuCategoryOptionResource;
-use App\Http\Resources\MenuCategoryResource;
+use App\Http\Resources\Api\Staff\MenuCategory\MenuCategoryResource;
+use App\Http\Resources\Api\Staff\MenuCategory\MenuCategoryOptionResource;
 use App\Models\MenuCategory;
 use Illuminate\Http\Request;
 

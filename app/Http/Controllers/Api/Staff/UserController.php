@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\Staff;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserAuthResource;
 use App\Http\Resources\Api\Staff\User\UserResource;
@@ -146,6 +147,21 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function owners()
+    {
+        $owners = User::with('role')
+            ->whereHas('role', function ($query) {
+                $query->where('slug', UserRole::Owner);
+            })
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data list owner',
+            'data' => UserResource::collection($owners),
+        ]);
+    }
+
     public function activeStore(Request $request)
     {
         $user = $request->user();
@@ -173,7 +189,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Resto/Toko berhasil diperbarui',
-            'data' => new UserAuthResource($user),
+            'data' => new UserResource($user),
         ]);
     }
 }

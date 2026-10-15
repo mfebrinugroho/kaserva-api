@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\RoleResource;
+use App\Http\Resources\Api\Staff\Role\RoleResource;
 use App\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

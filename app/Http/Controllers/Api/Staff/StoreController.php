@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\Staff;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\Staff\Store\StoreOptionResource;
 use App\Http\Resources\Api\Staff\Store\StoreResource;
-use App\Http\Resources\StoreOptionResource;
 use App\Models\Store;
+use App\Models\User;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
 class StoreController extends Controller
@@ -165,6 +167,17 @@ class StoreController extends Controller
         ], 200);
     }
 
+    public function options()
+    {
+        $stores = Store::select('id', 'name')->where('is_active', true)->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'List Data Resto',
+            'data' => StoreOptionResource::collection($stores),
+        ], 200);
+    }
+
     public function updateStatus(Request $request, Store $store)
     {
         // Gate::authorize('updateStatus', $store);
@@ -216,14 +229,57 @@ class StoreController extends Controller
         ]);
     }
 
-    public function options()
+    public function storesWithoutOwner()
     {
-        $stores = Store::select('id', 'name')->where('is_active', true)->get();
+        $stores = Store::doesntHave('owner')
+            ->orderBy('name')
+            ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'List Data Resto',
-            'data' => StoreOptionResource::collection($stores),
-        ], 200);
+            'message' => 'Data list resto/toko yang tersedia',
+            'data' => StoreResource::collection($stores),
+        ]);
+    }
+
+
+
+    public function addOwner(Request $request)
+    {
+        // Gate::authorize('addOwner', Store::class);
+
+        $validated = $request->validate([
+            'store_id' => ['required', 'exists:stores,id'],
+            'user_id' => ['required', 'exists:users,id'],
+        ]);
+
+        $store = Store::findOrFail($validated['store_id']);
+        $owner = User::with(['role', 'stores'])->findOrFail($validated['user_id']);
+
+        // Pastikan user adalah owner
+        if ($owner->role->slug !== UserRole::Owner) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User bukan owner.'
+            ], 422);
+        }
+
+        if ($store->owner()->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Store sudah memiliki owner.'
+            ], 422);
+        }
+
+        // Tambahkan jika belum terhubung
+        DB::transaction(function () use ($store, $owner) {
+            $store->users()->attach($owner->id);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Owner berhasil ditambahkan.',
+            'data' => new StoreResource($store),
+        ]);
     }
 }

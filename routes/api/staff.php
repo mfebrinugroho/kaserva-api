@@ -28,20 +28,27 @@ Route::prefix('staff')->group(function () {
       Route::post('/logout', [AuthController::class, 'logout']);
     });
 
-    // Super Admin
-    Route::middleware('role:super-admin')->group(function () {
-      Route::apiResource('users', UserController::class);
+    // Users
+    Route::prefix('users')->group(function () {
+      Route::get('/owners', [UserController::class, 'owners']);
+      Route::post('/active-store', [UserController::class, 'activeStore']);
     });
-    // Owner
-    Route::post('/users/active-store', [UserController::class, 'activeStore']);
 
-    // Role
+    Route::apiResource('users', UserController::class)->middleware('role:super-admin');
+
+    // Roles
     Route::apiResource('roles', RoleController::class);
 
-    Route::get('/stores/options', [StoreController::class, 'options']);
-    Route::apiResource('stores', StoreController::class);
-    Route::prefix('stores/{store}')->group(function () {
+    // Stores
+    Route::prefix('stores')->group(function () {
+      Route::get('/options', [StoreController::class, 'options']);
+      Route::get('/without-owner', [StoreController::class, 'storesWithoutOwner']);
+      Route::post('/add-owner', [StoreController::class, 'addOwner']);
+    });
 
+    Route::apiResource('stores', StoreController::class);
+
+    Route::prefix('stores/{store}')->group(function () {
       Route::patch('/status', [StoreController::class, 'updateStatus']);
       Route::patch('/status-operational', [StoreController::class, 'updateStatusOperational']);
       Route::patch('/status-order', [StoreController::class, 'updateStatusOrder']);
@@ -56,19 +63,14 @@ Route::prefix('staff')->group(function () {
         [StoreOperatingHourController::class, 'update']
       );
     });
-    Route::post('/stores/store-owner', [StoreOwnerController::class, 'addOwner']);
-    Route::prefix('stores-owners')->group(function () {
-      Route::get('/available-users', [StoreOwnerController::class, 'availableUsers']);
-      Route::get('/available-stores', [StoreOwnerController::class, 'availableStores']);
-    });
 
-
-
-    Route::apiResource('menus', MenuController::class);
-    Route::patch('/menus/{menu}/status-available', [MenuController::class, 'updateStatus']);
-
+    // Menu Categories
     Route::get('/menu-categories/options', [MenuCategoryController::class, 'options']);
     Route::apiResource('menu-categories', MenuCategoryController::class);
     Route::patch('/menu-categories/{menu_category}/status', [MenuCategoryController::class, 'updateStatus']);
+
+    // Menus
+    Route::apiResource('menus', MenuController::class);
+    Route::patch('/menus/{menu}/status-available', [MenuController::class, 'updateStatus']);
   });
 });

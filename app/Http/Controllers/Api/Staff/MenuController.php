@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api\Staff;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\MenuResource;
+use App\Http\Resources\Api\Staff\Menu\MenuResource;
 use App\Models\Menu;
 use App\Services\FileUploadService;
 use Illuminate\Http\Request;
