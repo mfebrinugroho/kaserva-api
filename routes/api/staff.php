@@ -6,7 +6,6 @@ use App\Http\Controllers\Api\Staff\UserController;
 use App\Http\Controllers\Api\Staff\RoleController;
 use App\Http\Controllers\Api\Staff\StoreController;
 use App\Http\Controllers\Api\Staff\StoreOperatingHourController;
-use App\Http\Controllers\Api\Staff\StoreOwnerController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 /*
@@ -72,5 +71,7 @@ Route::prefix('staff')->group(function () {
     // Menus
     Route::apiResource('menus', MenuController::class);
     Route::patch('/menus/{menu}/status-available', [MenuController::class, 'updateStatus']);
+
+    // Order
   });
 });
