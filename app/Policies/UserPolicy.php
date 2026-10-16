@@ -17,9 +17,6 @@ class UserPolicy
         return null;
     }
 
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): response
     {
         return $user->hasPermission('user.viewAny')
@@ -27,9 +24,6 @@ class UserPolicy
             : Response::deny('Anda tidak memiliki izin untuk melihat daftar data User.');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user): response
     {
         return $user->hasPermission('user.view')
@@ -37,9 +31,6 @@ class UserPolicy
             : Response::deny('Anda tidak memiliki izin untuk melihat data user ini.');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): response
     {
         return $user->hasPermission('user.create')
@@ -47,9 +38,6 @@ class UserPolicy
             : Response::deny('Anda tidak memiliki izin untuk membuat data user.');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user): response
     {
         return $user->hasPermission('user.update')
@@ -57,13 +45,17 @@ class UserPolicy
             : Response::deny('Anda tidak memiliki izin untuk mengubah data user.');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user): response
     {
         return $user->hasPermission('user.delete')
             ? Response::allow()
             : Response::deny('Anda tidak memiliki izin untuk mengubah data user.');
+    }
+
+    public function switchStore(User $user): response
+    {
+        return $user->hasPermission('user.switchStore')
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk mengubah resto yang aktif.');
     }
 }

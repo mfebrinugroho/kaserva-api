@@ -242,8 +242,6 @@ class StoreController extends Controller
         ]);
     }
 
-
-
     public function addOwner(Request $request)
     {
         // Gate::authorize('addOwner', Store::class);

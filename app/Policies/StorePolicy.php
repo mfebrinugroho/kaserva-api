@@ -18,19 +18,13 @@ class StorePolicy
         return null;
     }
 
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): response
     {
-        return $user->hasPermission('store.view')
+        return $user->hasPermission('store.viewAny')
             ? Response::allow()
             : Response::deny('Anda tidak memiliki izin untuk melihat daftar data resto/toko.');
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Store $store): response
     {
         if (!$user->hasPermission('store.view')) {
@@ -42,17 +36,13 @@ class StorePolicy
             : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
-    public function create(User $user): bool
+    public function create(User $user): response
     {
-        return false;
+        return $user->hasPermission('store.create')
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk membuat data resto/toko.');
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, Store $store): response
     {
         if (!$user->hasPermission('store.update')) {
@@ -64,26 +54,77 @@ class StorePolicy
             : Response::deny('Anda tidak memiliki izin untuk mengedit data resto/toko ini.');
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
-    public function delete(User $user, Store $store): bool
+    public function delete(User $user, Store $store): response
     {
-        return false;
+        if (!$user->hasPermission('store.delete')) {
+            return Response::deny('Anda tidak memiliki izin untuk menghapus data resto/toko ini.');
+        }
+
+        return $user->stores()->whereKey($store->id)->exists()
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk menghapus data resto/toko ini.');
     }
 
-    public function updateStatus(User $user, Store $store): bool
+    public function addOwner(User $user): response
     {
-        return false;
+        return $user->hasPermission('store.addOwner')
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk menambah owner pada resto.');
     }
 
-    public function addOwner(User $user, Store $store): bool
+    public function viewOptions(User $user, Store $store): response
     {
-        return false;
+        if (!$user->hasPermission('store.viewOptions')) {
+            return Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+        }
+
+        return $user->stores()->whereKey($store->id)->exists()
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk melihat opsi list resto.');
+    }
+
+    public function viewWithoutOwner(User $user): response
+    {
+        return $user->hasPermission('store.viewWithoutOwner')
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk melihat resto yang belum memiliki owner.');
+    }
+
+    public function viewOperatingHours(User $user, Store $store): response
+    {
+        if (!$user->hasPermission('store.viewOperatingHours')) {
+            return Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+        }
+
+        return $user->stores()->whereKey($store->id)->exists()
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+    }
+
+    public function updateOperatingHours(User $user, Store $store): response
+    {
+        if (!$user->hasPermission('store.updateOperatingHours')) {
+            return Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+        }
+
+        return $user->stores()->whereKey($store->id)->exists()
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+    }
+
+    public function updateStatus(User $user): response
+    {
+        return $user->hasPermission('store.updateStatus')
+            ? Response::allow()
+            : Response::deny('Anda tidak memiliki izin untuk mengubah status aktif resto.');
     }
 
     public function updateStatusOperational(User $user, Store $store): response
     {
+        if (!$user->hasPermission('store.updateStatusOperational')) {
+            return Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+        }
+
         return $user->stores()->whereKey($store->id)->exists()
             ? Response::allow()
             : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
@@ -91,6 +132,10 @@ class StorePolicy
 
     public function updateStatusOrder(User $user, Store $store): response
     {
+        if (!$user->hasPermission('store.updateStatusOrder')) {
+            return Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
+        }
+
         return $user->stores()->whereKey($store->id)->exists()
             ? Response::allow()
             : Response::deny('Anda tidak memiliki izin untuk melihat data resto/toko ini.');
