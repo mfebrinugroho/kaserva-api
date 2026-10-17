@@ -4,8 +4,8 @@ namespace App\Http\Controllers\Api\Staff;
 
 use App\Enums\DayOfWeek;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\StoreOperatingHourResource;
-use App\Http\Resources\StoreResource;
+use App\Http\Resources\Api\Staff\Store\StoreOperatingHourResource;
+use App\Http\Resources\Api\Staff\Store\StoreResource;
 use App\Models\Store;
 use App\Models\StoreOperatingHour;
 use Illuminate\Http\Request;
@@ -39,14 +39,13 @@ class StoreOperatingHourController extends Controller
                 'is_open' => $operatingHour
                     ? $operatingHour->is_open
                     : false,
-
             ];
         });
 
         return response()->json([
             'success' => true,
             'message' => 'List Data jam operasional toko',
-            'data' => $data,
+            'data' => StoreOperatingHourResource::collection($data),
         ], 200);
     }
 
